@@ -99,9 +99,9 @@ for(var x in bullets){
                         child: Container(width: 770,
                           child: new TextField(maxLines:null,style:TextStyle(fontSize: 14),controller: tc,onChanged: (val){
                           bullets[i]=val;
-                         // setState(() {
+                          //setState(() {
                             addState();
-                        //  });
+                          //});
 
                           },
                         ),
@@ -134,7 +134,7 @@ for(var x in bullets){
             for(var x in bullets){
               bulletsTemp.add(x);
             }
-            addState();
+           // addState();
             setState(() {
               editing=!editing;
             });
@@ -173,29 +173,48 @@ for(var x in bullets){
                    // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
                     });
                   },),
-                  IconButton(icon:Icon(Icons.undo,color:Colors.blue),onPressed: (){
-
+                  IconButton(icon:Icon(Icons.undo,color:Colors.blue),onPressed:(){
+                    bullets.clear();
                     setState(() {
-                      if(undo.moreThanOneRemaining()){
-                        List l=undo.pop();
-                        redo.push(l);
-                        bullets=l;
+                      if(!undo.isEmpty){
+
+                        redo.push( undo.pop());
+
+                      }
+                      if(undo.isEmpty){
+                        for(var x in bulletsTemp){
+                          bullets.add(x);
+                        }
+                      }
+                      else{
+                        for(var x in undo.peek()){
+                          bullets.add(x);
+                        }
                       }
 
                     });
 
                   },),
                   IconButton(icon:Icon(Icons.redo,color:Colors.blue),onPressed:(){
-
+                   /* bullets.clear();
                     setState(() {
-                      if(redo.moreThanOneRemaining()){
-                        List l=redo.pop();
-                        undo.push(l);
-                        bullets=l;
+                      if(!redo.isEmpty){
+
+                        undo.push( redo.pop());
+
+                      }
+                      if(redo.isEmpty){
+                        for(var x in bulletsTemp){
+                          bullets.add(x);
+                        }
+                      }
+                      else{
+                        for(var x in undo.peek()){
+                          bullets.add(x);
+                        }
                       }
 
-                    });
-
+                    });*/
                   },),
                 ],
               ):
