@@ -196,14 +196,14 @@ for(var x in bullets){
 
                   },),
                   IconButton(icon:Icon(Icons.redo,color:Colors.blue),onPressed:(){
-                   /* bullets.clear();
+                    bullets.clear();
                     setState(() {
                       if(!redo.isEmpty){
 
                         undo.push( redo.pop());
 
                       }
-                      if(redo.isEmpty){
+                      if(undo.isEmpty){
                         for(var x in bulletsTemp){
                           bullets.add(x);
                         }
@@ -213,8 +213,18 @@ for(var x in bullets){
                           bullets.add(x);
                         }
                       }
+                    /*  if(redo.isEmpty){
+                        for(var x in bulletsTemp){
+                          bullets.add(x);
+                        }
+                      }
+                      else{
+                        for(var x in undo.peek()){
+                          bullets.add(x);
+                        }
+                      }*/
 
-                    });*/
+                    });
                   },),
                 ],
               ):
