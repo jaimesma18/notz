@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "446662336917",
+    "project_id": "notz-f0176",
+    "storage_bucket": "notz-f0176.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446662336917:android:88c369094bf7011ce3d69c",
+        "android_client_info": {
+          "package_name": "com.zuttotechnologies.notz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446662336917-av31hns5crluc0qorj7ssm778ej6apea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZBVDAooGCPdnjBTqiEdIHLtXhHvfd6dQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446662336917-av31hns5crluc0qorj7ssm778ej6apea.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
