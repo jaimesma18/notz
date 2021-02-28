@@ -1,12 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notz/classes/Product.dart';
 import 'package:notz/classes/User.dart';
+import 'package:notz/services/auth.dart';
 class DatabaseService{
 String model;
 
   DatabaseService({this.model});
   final CollectionReference productos=FirebaseFirestore.instance.collection('products');
 
+
+ Future log({String model,String type,String field,dynamic before,dynamic after}){
+   CollectionReference log = FirebaseFirestore.instance.collection('log');
+
+   Map <String,dynamic> m=new Map<String,dynamic>();
+
+
+   m['user']=AuthService().userInfo().email;
+   m['timestamp']=DateTime.now();
+   m['model']=model;
+   m['type']=type;
+   m['field']=field;
+   m['before']=before;
+   m['after']=after;
+
+
+   return log
+       .doc()
+       .set(m)
+       .then((value) => print("Log added"))
+       .catchError((error) => print("Failed to add log: $error"));
+
+ }
 
 Product productFromDoc(Map<String,dynamic> m){
   Product p;
@@ -248,7 +272,8 @@ Future<void> updateUser(String email,{String name,String lastname,String area,Ma
       .catchError((error) => print("Failed to update user: $error"));
 }
 
-Future<void> updateProduct(String model,{String brand,String title,String upc,List photos,List bullets,Map technicals,Map customs,Map dimensions,Map manufacturer,List keywords,Map photosNames}) {
+
+Future<void> updateProduct(String model,{String brand,String title,String upc,List photos,List bullets,Map technicals,Map customs,Map dimensions,Map manufacturer,List keywords,Map photosNames,dynamic before}) {
   CollectionReference products = FirebaseFirestore.instance.collection('products');
 
 
@@ -276,6 +301,9 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   }
   if(bullets!=null){
     m['bullets']=bullets;
+    if(before!=null) {
+      log(model:model,field: "Caracteristicas",before: before,after: bullets,type: "Update");
+    }
   }
   if(technicals!=null){
     m['tecnicas']=technicals;

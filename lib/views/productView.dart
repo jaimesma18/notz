@@ -237,7 +237,7 @@ Future<Product> downloadProduct(String model)async{
                 print(search.text);
               },)),
                Expanded(flex: 20,
-                 child: TextField(autofocus: true,
+                 child: TextField(
 
                      decoration: InputDecoration.collapsed(
                       hintStyle: new TextStyle(letterSpacing:.6,wordSpacing: 1,color: Colors.white,fontSize: 16),
@@ -262,7 +262,7 @@ Future<Product> downloadProduct(String model)async{
               print(search.text);
             },)),
             Expanded(flex: 50,
-              child: TextField(autofocus: true,onSubmitted: (val){
+              child: TextField(onSubmitted: (val){
 
                 Navigator.pop(context,val);
               },
