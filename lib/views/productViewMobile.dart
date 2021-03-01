@@ -19,13 +19,13 @@ import 'package:notz/classes/Product.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/views/users.dart';
 
-class ProductView extends StatefulWidget {
+class ProductViewMobile extends StatefulWidget {
   @override
 
-  _ProductViewState createState() => _ProductViewState();
+  _ProductViewMobileState createState() => _ProductViewMobileState();
 }
 
-class _ProductViewState extends State<ProductView> {
+class _ProductViewMobileState extends State<ProductViewMobile> {
 
   final AuthService _auth=AuthService();
  Widget selectedWidget;
@@ -81,12 +81,7 @@ Future<Product> downloadProduct(String model)async{
 
     }
     else {
-      final double deviceWidth = MediaQuery
-          .of(context)
-          .size
-          .width;
-      bool isMobile;
-      deviceWidth >= 768 ? isMobile = false : isMobile = true;
+
       if (!loaded) {
         data = ModalRoute
             .of(context)
@@ -115,20 +110,22 @@ Future<Product> downloadProduct(String model)async{
       backgroundColor: Colors.white,
       appBar:AppBar(title: TextBox(),
         actions: [
+
           /*IconButton(icon: Icon(Icons.logout,size: 26),onPressed: ()async{
             await _auth.signOut();
           },)*/
         ],),
+      endDrawer: product==null||permissions==null?Container():permissionDrawer(),
       body: product==null||permissions==null?Container():
       SingleChildScrollView(scrollDirection: Axis.vertical,child:
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
+              /*Padding(
                 padding: const EdgeInsets.fromLTRB(34, 8, 0, 14),
                 child: permissionsBar(),
-              ),
+              ),*/
               SizedBox(height: 10,),
               Row(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -258,7 +255,7 @@ Future<Product> downloadProduct(String model)async{
         //color: bgColor,
         child: Row(mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(flex:2,child: IconButton(icon:Icon(Icons.search),onPressed: (){
+            Expanded(flex:8,child: IconButton(icon:Icon(Icons.search),onPressed: (){
               print(search.text);
             },)),
             Expanded(flex: 50,
@@ -273,7 +270,7 @@ Future<Product> downloadProduct(String model)async{
                   });*/
                 },
                 decoration:
-                InputDecoration(border: InputBorder.none, hintText: 'Buscar modelo, UPC o palabras clave',hintStyle: TextStyle(letterSpacing:.6,wordSpacing: 1,color: Colors.white,fontSize: 16)),
+                InputDecoration(border: InputBorder.none, hintText: 'Buscar modelo, UPC o palabras clave',hintStyle: TextStyle(letterSpacing:0,wordSpacing: 1,color: Colors.white,fontSize: 16)),
               ),
             ),
           ],
@@ -281,42 +278,63 @@ Future<Product> downloadProduct(String model)async{
     );
   }
 
-  Widget permissionsBar(){
 
+  Widget permissionDrawer() {
+    Map<String, Widget> widgets = new Map<String, Widget>();
+    widgets['Características'] = Bullets(bullets: product.bullets,
+      edit: permissions["Características"] > 1,
+      model: product.model,);
+    widgets['Medidas'] = Dimensions(dimensions: product.dimensions,
+        edit: permissions["Medidas"] > 1 ? true : false);
+    widgets['Código de Barras'] = BCode(upc: product.upc,
+        edit: permissions["Código de Barras"] > 1 ? true : false);
+    widgets['Usuarios'] = Users();
 
-    Map<String,Widget> widgets=new Map<String,Widget>();
-    widgets['Características']=Bullets(bullets:product.bullets,edit: permissions["Características"]>1,model: product.model,);
-    widgets['Medidas']=Dimensions(dimensions:product.dimensions,edit: permissions["Medidas"]>1?true:false);
-    widgets['Código de Barras']=BCode(upc:product.upc,edit: permissions["Código de Barras"]>1?true:false);
-    widgets['Usuarios']=Users();
-
-    List l0=permissions.keys.toList();
+    List l0 = permissions.keys.toList();
     l0.sort((a, b) => a.toString().compareTo(b.toString()));
-    if(permissions!=null){
-      List<Widget> l=[];
-      l.add(VerticalDivider(color: Colors.black,thickness: 1,));
-      for(var x in l0){
-        if(permissions[x]>0){
-          Color c=Colors.black;
-          if(x==selectedWidgetText){
-            c=Colors.blue;
+    if (permissions != null) {
+      List<Widget> l = [];
+      l.add(Container(height: 56,
+        child: DrawerHeader(
+          margin:  EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Align(alignment:Alignment.centerLeft,child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Align(alignment: Alignment.centerLeft,
+              child: FlatButton.icon(icon:Icon(Icons.arrow_back,color:Colors.white,size: 24,),label: Text("Volver a Menu Principal",style:TextStyle(color: Colors.white,fontSize: 16),),onPressed: (){
+                int count = 0;
+                Navigator.of(context).popUntil((_) => count++ >= 2);
+              },),
+             /* child: FlatButton(child: Align(alignment:Alignment.centerLeft,child: Text("Volver a Menu Principal",style:TextStyle(color: Colors.white,fontSize: 16),)),onPressed: (){
+                int count = 0;
+                Navigator.of(context).popUntil((_) => count++ >= 2);
+              },),*/
+            )
+          )),
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+        ),
+      ),);
+      for (var x in l0) {
+        if (permissions[x] > 0) {
+          Color c = Colors.black;
+          if (x == selectedWidgetText) {
+            c = Colors.blue;
           }
-          l.add(FlatButton(child: Text(x,style: TextStyle(color: c),),onPressed: (){
+          l.add(FlatButton(
+            child: Text(x, style: TextStyle(color: c),), onPressed: () {
             setState(() {
-              selectedWidget=widgets[x];
-              selectedWidgetText=x;
+              selectedWidget = widgets[x];
+              selectedWidgetText = x;
             });
           },));
           l.add(SizedBox(width: 4,));
-          l.add(VerticalDivider(color: Colors.black,thickness: 1,));
+          l.add(VerticalDivider(color: Colors.black, thickness: 1,));
         }
       }
-
-    //  l.removeLast();
-     return SingleChildScrollView(scrollDirection:Axis.horizontal,child: Container(child: IntrinsicHeight(child: Row(mainAxisAlignment:MainAxisAlignment.start,children: l)),));
+      return SafeArea(child: Container(child: Drawer(child: ListView(children: l,),)));
     }
   }
-
-
 
 }

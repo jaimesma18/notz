@@ -108,60 +108,137 @@ class _HomeState extends State<Home> {
 
 
 
+if(!isMobile) {
+  return !loaded ? Container() : Scaffold(
+    backgroundColor: Colors.white,
+    appBar: AppBar(title: TextBox(isMobile),
+      actions: [
 
-    return !loaded?Container():Scaffold(
-      backgroundColor: Colors.white,
-      appBar:AppBar(title: TextBox(),
-        actions: [
+        IconButton(
+          icon: Icon(Icons.upload_sharp, size: 26), onPressed: () async {
+          Navigator.pushNamed(context, "/tester");
+        },),
 
-          IconButton(icon: Icon(Icons.upload_sharp,size: 26),onPressed: ()async{
-           Navigator.pushNamed(context, "/tester");
-
-          },),
-
-          showUserManagement?IconButton(icon:Icon(Icons.supervised_user_circle_rounded,size: 26),onPressed: ()async{
-            Map m=new Map();
-            m['user']=user;
+        showUserManagement ? IconButton(
+          icon: Icon(Icons.supervised_user_circle_rounded, size: 26),
+          onPressed: () async {
+            Map m = new Map();
+            m['user'] = user;
             //m['isOwner']=isOwner;
-            m['maxLevel']=maxLevel;
-          Navigator.pushNamed(context, '/userManagement',arguments:m );
+            m['maxLevel'] = maxLevel;
+            Navigator.pushNamed(context, '/userManagement', arguments: m);
+          },) : Container(),
 
-          },):Container(),
-
-          IconButton(icon: Icon(Icons.logout,size: 26),onPressed: ()async{
-            await _auth.signOut();
-
-          },),
-        ],),
-      body://SingleChildScrollView(
-        //child:
+        IconButton(icon: Icon(Icons.logout, size: 26), onPressed: () async {
+          await _auth.signOut();
+        },),
+      ],),
+    body: //SingleChildScrollView(
+    //child:
     //  ImageUploader(),
-       //
-        GridView.count(
-          // Create a grid with 2 columns. If you change the scrollDirection to
-          // horizontal, this produces 2 rows.
-          crossAxisCount: 5,
-          // Generate 100 widgets that display their index in the List.
-          children: List.generate(products.keys.length, (index) {
+    //
+    GridView.count(
+      // Create a grid with 2 columns. If you change the scrollDirection to
+      // horizontal, this produces 2 rows.
+      crossAxisCount: 5,
+      // Generate 100 widgets that display their index in the List.
+      children: List.generate(products.keys.length, (index) {
+        Function f = (String val) {
+          if (val != null) {
+            search.text = val;
+            query(val);
+          }
+        };
+        return Center(
+          child: Square(products[products.keys.toList()[index]], f: f,),
+        );
+      }),
+    ),
 
-            Function f=(String val){
-              if(val!=null) {
-                search.text = val;
-                query(val);
-              }
-            };
-            return Center(
-              child: Square(products[products.keys.toList()[index]],f: f,),
-            );
-          }),
+  ); //,// ProductView(),
+}
+else{
+  return !loaded ? Container() : Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: TextBox(isMobile),
+    actions: [
+
+   /* IconButton(
+
+      icon: Icon(Icons.menu, size: 26), onPressed: () async {
+
+    },),*/
+
+    ],),
+    endDrawer:SafeArea(
+      child: Container(width: 200,
+        child: Drawer(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              Container(height: 56,
+                child: DrawerHeader(
+                 margin:  EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: Align(alignment:Alignment.centerLeft,child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text("Menu",style: TextStyle(color: Colors.white,fontSize: 16),),
+                  )),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+              Align(alignment: Alignment.centerLeft,
+                child: FlatButton.icon(label: Text("Tester",style: TextStyle(fontSize: 16),),
+                  icon: Icon(Icons.upload_sharp, size: 26), onPressed: () async {
+                  Navigator.pushNamed(context, "/tester");
+                },),
+              ),
+
+              showUserManagement ?  Align(alignment: Alignment.centerLeft,
+                child: FlatButton.icon(label: Text("Usuarios",style: TextStyle(fontSize: 16),),
+                    icon: Icon(Icons.supervised_user_circle_rounded, size: 26),
+                    onPressed: () async {
+                      Map m = new Map();
+                      m['user'] = user;
+                      //m['isOwner']=isOwner;
+                      m['maxLevel'] = maxLevel;
+                      Navigator.pushNamed(context, '/userManagement', arguments: m);
+                    },),
+              ) : Container(),
+              Align(alignment: Alignment.centerLeft,
+                child: FlatButton.icon(label: Text("Salir",style: TextStyle(fontSize: 16),),
+                 icon: Icon(Icons.logout, size: 26), onPressed: () async {
+                await _auth.signOut();
+              },),
+              ),
+            ],
+          ),
         ),
-
-
-
-
-
-      );//,// ProductView(),
-
+      ),
+    ) ,
+    body:
+    GridView.count(
+      // Create a grid with 2 columns. If you change the scrollDirection to
+      // horizontal, this produces 2 rows.
+      crossAxisCount: 2,
+      // Generate 100 widgets that display their index in the List.
+      children: List.generate(products.keys.length, (index) {
+        Function f = (String val) {
+          if (val != null) {
+            search.text = val;
+            query(val);
+          }
+        };
+        return Center(
+          child: Square(products[products.keys.toList()[index]], f: f,),
+        );
+      }),
+    ),
+  );
+    }
 
    // );
   }
@@ -198,12 +275,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget TextBox(){
+  Widget TextBox(bool isMobile){
     return Container(
         //color: bgColor,
         child: Row(mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(flex:2,child: IconButton(icon:Icon(Icons.search),onPressed: (){
+            Expanded(flex:isMobile?8:2,child: IconButton(icon:Icon(Icons.search),onPressed: (){
              // print(search.text);
             },)),
             Expanded(flex: 50,
@@ -220,12 +297,12 @@ class _HomeState extends State<Home> {
 
                 },
                 controller:search,cursorColor:Colors.white,style:TextStyle(color: Colors.white, fontSize: 18),onChanged: (val){
-                  setState(() {
+                 /* setState(() {
 
-                  });
+                  });*/
                 },
                 decoration:
-                InputDecoration(border: InputBorder.none, hintText: 'Buscar modelo, UPC o palabras clave',hintStyle: TextStyle(letterSpacing:.6,wordSpacing: 1,color: Colors.white,fontSize: 16)),
+                InputDecoration(border: InputBorder.none, hintText: 'Buscar modelo, UPC o palabras clave',hintStyle: TextStyle(letterSpacing:isMobile?0.0:0.6,wordSpacing: 1,color: Colors.white,fontSize: 16)),
               ),
             ),
           ],

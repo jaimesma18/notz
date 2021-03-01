@@ -4,6 +4,7 @@ import 'package:notz/views/home.dart';
 import 'package:notz/views/login.dart';
 import 'package:notz/views/productView.dart';
 import 'package:notz/views/passwordReset.dart';
+import 'package:notz/views/productViewMobile.dart';
 import 'package:notz/views/uploadProduct.dart';
 import 'package:notz/views/users.dart';
 import 'wrapper.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
           '/userManagement':(context)=>Users(),
           '/home':(context)=>Home(),
           '/productView':(context)=>ProductView(),
+          '/productViewMobile':(context)=>ProductViewMobile(),
           '/login':(context)=>Login(),
           '/resetPassword':(context)=>PasswordReset(),
           '/upload':(context)=>UploadProduct(),
