@@ -277,11 +277,13 @@ else{
 
   Widget TextBox(bool isMobile){
     return Container(
-        //color: bgColor,
+
         child: Row(mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(flex:isMobile?8:2,child: IconButton(icon:Icon(Icons.search),onPressed: (){
-             // print(search.text);
+            Expanded(flex:isMobile?8:2,child: IconButton(icon:Icon(Icons.search),onPressed: ()async{
+            if(search.text!=null||search.text!=""){
+              await query(search.text);
+            }
             },)),
             Expanded(flex: 50,
               child: TextField(//autofocus: true,

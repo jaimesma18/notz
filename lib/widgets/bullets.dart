@@ -68,6 +68,7 @@ for(var x in bullets){
 
   void doneEditing(){
     if(editingBulletIndex>=0) {
+
       bullets[editingBulletIndex] = editingBullet;
       addState();
       editingBulletIndex=-1;
@@ -148,7 +149,9 @@ for(var x in bullets){
 
   @override
   Widget build(BuildContext context) {
-
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    bool isMobile;
+    deviceWidth>=768?isMobile=false:isMobile=true;
 
     if(editing) {
       buildTiles();
@@ -159,7 +162,7 @@ for(var x in bullets){
     return
       Column(crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          widget.edit?!editing?FlatButton.icon(icon:Icon(Icons.edit,color:Colors.blue),label: Text("Editar",style: TextStyle(color: Colors.blue,),),onPressed: (){
+          widget.edit?!editing?FlatButton.icon(icon:Icon(Icons.edit,color:Colors.blue),label: Text("Editar (${bullets.length} características)",style: TextStyle(color: Colors.blue,),),onPressed: (){
             bulletsTemp.clear();
             for(var x in bullets){
               bulletsTemp.add(x);
@@ -169,97 +172,138 @@ for(var x in bullets){
               editing=!editing;
             });
           },):
-              Row(
-                children: [
-                  FlatButton.icon(icon:Icon(Icons.check_circle,color:Colors.green),label: Text("Guardar",style: TextStyle(color: Colors.green,),),onPressed: ()async{
-                    doneEditing();
-                    undo.clear();
-                    redo.clear();
-                  while(bullets.contains("")) {
-                    bullets.remove("");
-                  }
-
-
-                    setState(() {
-                      editing=!editing;
-                    });
-                  await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
-                  },),
-                  SizedBox(width: 4,),
-                  FlatButton.icon(icon:Icon(Icons.cancel,color:Colors.red),label: Text("Cancelar",style: TextStyle(color: Colors.red,),),onPressed: (){
-                    bullets.clear();
-                    undo.clear();
-                    redo.clear();
-                    for(var x in bulletsTemp){
-                      bullets.add(x);
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal:8.0),
+                child: Row(mainAxisAlignment: isMobile?MainAxisAlignment.spaceEvenly:MainAxisAlignment.center,
+                  children: [
+                   !isMobile? FlatButton.icon(icon:Icon(Icons.check_circle,color:Colors.green),label: Text("Guardar",style: TextStyle(color: Colors.green,),),onPressed: ()async{
+                      doneEditing();
+                      undo.clear();
+                      redo.clear();
+                    while(bullets.contains("")) {
+                      bullets.remove("");
                     }
-                    setState(() {
-                      editing=!editing;
-                    });
-                  },),
-                  FlatButton.icon(icon:Icon(Icons.add_circle,color:Colors.blue),label: Text("Agregar Bullet",style: TextStyle(color: Colors.blue,),),onPressed: (){
-                    doneEditing();
-                    setState(() {
-                      bullets.add("");
-                   // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
-                    });
-                  },),
-                  IconButton(icon:Icon(Icons.undo,color:undo.isEmpty?Colors.grey[400]:Colors.blue),onPressed:undo.isEmpty?null:(){
-                    doneEditing();
-                    bullets.clear();
-                    setState(() {
-                      if(!undo.isEmpty){
 
-                        redo.push( undo.pop());
 
+                      setState(() {
+                        editing=!editing;
+                      });
+                    await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+                    },):IconButton(icon:Icon(Icons.check_circle,color:Colors.green,size: 36,),onPressed: ()async{
+                     doneEditing();
+                     undo.clear();
+                     redo.clear();
+                     while(bullets.contains("")) {
+                       bullets.remove("");
+                     }
+
+
+
+                     setState(() {
+                       editing=!editing;
+                     });
+                     await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+                   },),
+
+
+
+                    SizedBox(width: isMobile?12:4,),
+
+                   !isMobile? FlatButton.icon(icon:Icon(Icons.cancel,color:Colors.red),label: Text("Cancelar",style: TextStyle(color: Colors.red,),),onPressed: (){
+                      bullets.clear();
+                      undo.clear();
+                      redo.clear();
+                      for(var x in bulletsTemp){
+                        bullets.add(x);
                       }
-                      if(undo.isEmpty){
-                        for(var x in bulletsTemp){
-                          bullets.add(x);
+                      setState(() {
+                        editing=!editing;
+                      });
+                    },):IconButton(icon:Icon(Icons.cancel,color:Colors.red,size:36 ,),onPressed: (){
+                     bullets.clear();
+                     undo.clear();
+                     redo.clear();
+                     for(var x in bulletsTemp){
+                       bullets.add(x);
+                     }
+                     setState(() {
+                       editing=!editing;
+                     });
+                   },),
+                    SizedBox(width: isMobile?12:4,),
+
+                    !isMobile?FlatButton.icon(icon:Icon(Icons.add_circle,color:Colors.blue),label: Text("Agregar Bullet",style: TextStyle(color: Colors.blue,),),onPressed: (){
+                      doneEditing();
+                      setState(() {
+                        bullets.add("");
+                     // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
+                      });
+                    },):IconButton(icon:Icon(Icons.add_circle,color:Colors.blue,size: 36,),onPressed: (){
+                      doneEditing();
+                      setState(() {
+                        bullets.add("");
+                        // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
+                      });
+                    },),
+                    SizedBox(width: isMobile?12:4,),
+                    IconButton(icon:Icon(Icons.undo,color:undo.isEmpty?Colors.grey[400]:Colors.blue,size:isMobile?36:24),onPressed:undo.isEmpty?null:(){
+                      doneEditing();
+                      bullets.clear();
+                      setState(() {
+                        if(!undo.isEmpty){
+
+                          redo.push( undo.pop());
+
                         }
-                      }
-                      else{
-                        for(var x in undo.peek()){
-                          bullets.add(x);
+                        if(undo.isEmpty){
+                          for(var x in bulletsTemp){
+                            bullets.add(x);
+                          }
                         }
-                      }
-
-                    });
-
-                  },),
-                  IconButton(icon:Icon(Icons.redo,color:redo.isEmpty?Colors.grey[400]:Colors.blue),onPressed:redo.isEmpty?null:(){
-                   doneEditing();
-                    bullets.clear();
-                    setState(() {
-                      if(!redo.isEmpty){
-
-                        undo.push( redo.pop());
-
-                      }
-                      if(undo.isEmpty){
-                        for(var x in bulletsTemp){
-                          bullets.add(x);
+                        else{
+                          for(var x in undo.peek()){
+                            bullets.add(x);
+                          }
                         }
-                      }
-                      else{
-                        for(var x in undo.peek()){
-                          bullets.add(x);
-                        }
-                      }
-                    /*  if(redo.isEmpty){
-                        for(var x in bulletsTemp){
-                          bullets.add(x);
-                        }
-                      }
-                      else{
-                        for(var x in undo.peek()){
-                          bullets.add(x);
-                        }
-                      }*/
 
-                    });
-                  },),
-                ],
+                      });
+
+                    },),
+                    SizedBox(width: isMobile?12:4,),
+                    IconButton(icon:Icon(Icons.redo,color:redo.isEmpty?Colors.grey[400]:Colors.blue,size:isMobile?36:24),onPressed:redo.isEmpty?null:(){
+                     doneEditing();
+                      bullets.clear();
+                      setState(() {
+                        if(!redo.isEmpty){
+
+                          undo.push( redo.pop());
+
+                        }
+                        if(undo.isEmpty){
+                          for(var x in bulletsTemp){
+                            bullets.add(x);
+                          }
+                        }
+                        else{
+                          for(var x in undo.peek()){
+                            bullets.add(x);
+                          }
+                        }
+                      /*  if(redo.isEmpty){
+                          for(var x in bulletsTemp){
+                            bullets.add(x);
+                          }
+                        }
+                        else{
+                          for(var x in undo.peek()){
+                            bullets.add(x);
+                          }
+                        }*/
+
+                      });
+                    },),
+                  ],
+                ),
               ):
 
           Container(),
@@ -310,7 +354,7 @@ for(var x in bullets){
 
               ReorderableWrap(
                 direction:Axis.vertical ,
-                  needsLongPressDraggable: false,
+                  needsLongPressDraggable: isMobile,
                   spacing: 8.0,
                   runSpacing: 4.0,
                   padding: const EdgeInsets.all(0),

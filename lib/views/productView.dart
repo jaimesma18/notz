@@ -259,7 +259,9 @@ Future<Product> downloadProduct(String model)async{
         child: Row(mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Expanded(flex:2,child: IconButton(icon:Icon(Icons.search),onPressed: (){
-              print(search.text);
+              if(search.text!=null||search.text!=""){
+                Navigator.pop(context,search.text);
+              }
             },)),
             Expanded(flex: 50,
               child: TextField(onSubmitted: (val){

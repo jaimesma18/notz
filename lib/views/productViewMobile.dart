@@ -126,8 +126,42 @@ Future<Product> downloadProduct(String model)async{
                 padding: const EdgeInsets.fromLTRB(34, 8, 0, 14),
                 child: permissionsBar(),
               ),*/
+
               SizedBox(height: 10,),
-              Row(crossAxisAlignment: CrossAxisAlignment.start,
+              Center(child: Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),)),
+              SizedBox(height: 6,),
+              Carousel(urls:product.photos ,),
+              SizedBox(height: 6,),
+              RichText(
+                text: new TextSpan(
+                  style: new TextStyle(
+                    letterSpacing: .6,
+                    fontSize: 16.0,
+                    color: Colors.black,
+                  ),
+                  children: <TextSpan>[
+                    new TextSpan(text: 'Marca: ',style: new TextStyle(fontWeight: FontWeight.bold)),
+                    new TextSpan(text: product.brand, ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 4,),
+              RichText(
+                text: new TextSpan(
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.black,
+                  ),
+                  children: <TextSpan>[
+                    new TextSpan(text: 'Modelo: ',style: new TextStyle(fontWeight: FontWeight.bold)),
+                    new TextSpan(text: product.model, ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10,),
+              selectedWidget,
+
+              /*Row(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(flex:2,child: Container()),
                   Expanded(flex:14,child: Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +208,7 @@ Future<Product> downloadProduct(String model)async{
                        // Container(child: Text("$sgroup"),),
                         Carousel(urls:product.photos ,),
 
-                       /* Row(
+                       *//* Row(
                           children: [
                             Expanded(flex:3,child: Container(),),
                             product.upc!=null?kIsWeb?Expanded(flex:3,child: Container(width: 10,child: BarcodeWidget(data: product.upc, barcode: Barcode.ean13()))):Expanded(flex:7,child: Container(width: 10,child: BarcodeWidget(data: product.upc, barcode: Barcode.ean13()))):Container(),
@@ -185,7 +219,7 @@ Future<Product> downloadProduct(String model)async{
                           print(Barcode.ean13().isValid(product.upc));
 
                         //  buildBarcode(Barcode.ean13(), "7506304311925");
-                          *//*if(kIsWeb){
+                          *//**//*if(kIsWeb){
                             final image = Image(600, 350);
 
                             // Fill it with a solid color (white)
@@ -199,15 +233,15 @@ Future<Product> downloadProduct(String model)async{
                           }
                           else{
 
-                          }*//*
+                          }*//**//*
                            //   buildBarcode(Barcode.ean13(), "7506304311925",filename: "bc_7506304311925",height: 200,width: 400,fontHeight: 20);
-                        },),*/
+                        },),*//*
                       ],
                     ),
                   ),
                   Expanded(flex:1,child: Container()),
                 ],
-              ),
+              ),*/
             ],
           ),
         ),
@@ -256,7 +290,9 @@ Future<Product> downloadProduct(String model)async{
         child: Row(mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Expanded(flex:8,child: IconButton(icon:Icon(Icons.search),onPressed: (){
-              print(search.text);
+              if(search.text!=null||search.text!=""){
+                Navigator.pop(context,search.text);
+              }
             },)),
             Expanded(flex: 50,
               child: TextField(onSubmitted: (val){

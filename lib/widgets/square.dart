@@ -20,7 +20,7 @@ class Square extends StatelessWidget {
       m['product']=p;
 
       dynamic res=await Navigator.pushNamed(context, prodView,arguments: m,);
-
+      f(res);
     },
       child: !isMobile?Container(height: 220,width:220,margin: EdgeInsets.fromLTRB(7.5, 15, 7.5, 0),
         child: Column(children: [
