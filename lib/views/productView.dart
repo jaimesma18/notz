@@ -37,7 +37,7 @@ class _ProductViewState extends State<ProductView> {
   //String model="LC-1192";
   Product product;
   TextEditingController search= new TextEditingController();
-
+  ScrollController scroller=new ScrollController();
 
 
   @override
@@ -119,119 +119,121 @@ Future<Product> downloadProduct(String model)async{
           },)*/
         ],),
       body: product==null||permissions==null?Container():
-      SingleChildScrollView(scrollDirection: Axis.vertical,child:
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(34, 8, 0, 14),
-                child: permissionsBar(),
-              ),
-              SizedBox(height: 10,),
-              Row(crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(flex:2,child: Container()),
-                  Expanded(flex:14,child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),),
-                    SizedBox(height: 6,),
-                    RichText(
-                      text: new TextSpan(
-                        style: new TextStyle(
-                          letterSpacing: .6,
-                          fontSize: 16.0,
-                          color: Colors.black,
-                        ),
-                        children: <TextSpan>[
-                          new TextSpan(text: 'Marca: ',style: new TextStyle(fontWeight: FontWeight.bold)),
-                          new TextSpan(text: product.brand, ),
-                        ],
-                      ),
-                    ),
-                      SizedBox(height: 4,),
+      Scrollbar(isAlwaysShown: true,controller: scroller,
+        child: SingleChildScrollView(scrollDirection: Axis.vertical,child:
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(34, 8, 0, 14),
+                  child: permissionsBar(),
+                ),
+                SizedBox(height: 10,),
+                Row(crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex:2,child: Container()),
+                    Expanded(flex:14,child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                      Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),),
+                      SizedBox(height: 10,),
                       RichText(
                         text: new TextSpan(
                           style: new TextStyle(
+                            letterSpacing: .6,
                             fontSize: 16.0,
                             color: Colors.black,
                           ),
                           children: <TextSpan>[
-                            new TextSpan(text: 'Modelo: ',style: new TextStyle(fontWeight: FontWeight.bold)),
-                            new TextSpan(text: product.model, ),
+                            new TextSpan(text: 'Marca: ',style: new TextStyle(fontWeight: FontWeight.bold)),
+                            new TextSpan(text: product.brand, ),
                           ],
                         ),
                       ),
-                    SizedBox(height: 10,),
-
-                     selectedWidget,
-                     // Dimensions(dimensions: product.dimensions,)
-                    //Bullets(bullets:product.bullets),
-                  ],)),
-                  Expanded(flex:2,child: Container()),
-                  Expanded(flex: 14,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 40,),
-                       // Container(child: Text("$sgroup"),),
-                        Stack(children: [
-
-                          Positioned(top: 0,right: 70,
-                            child: IconButton(icon: Icon(Icons.edit,color: Colors.blue,),onPressed:()async
-                             {
-                               Map m=new Map();
-                               m['model']=product.model;
-                               print('pre');
-                                await Navigator.pushNamed(context, "/imageEditor",arguments: m);
-
-                                 print('post');
-                               product= await  downloadProduct(product.model);
-
-                               print(product.photos);
-
-                            },),
+                        SizedBox(height: 4,),
+                        RichText(
+                          text: new TextSpan(
+                            style: new TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.black,
+                            ),
+                            children: <TextSpan>[
+                              new TextSpan(text: 'Modelo: ',style: new TextStyle(fontWeight: FontWeight.bold)),
+                              new TextSpan(text: product.model, ),
+                            ],
                           ),
-
-                          Container(padding:EdgeInsets.all(40),child: Carousel(urls:product.photos))]),
-
-                       /* Row(
-                          children: [
-                            Expanded(flex:3,child: Container(),),
-                            product.upc!=null?kIsWeb?Expanded(flex:3,child: Container(width: 10,child: BarcodeWidget(data: product.upc, barcode: Barcode.ean13()))):Expanded(flex:7,child: Container(width: 10,child: BarcodeWidget(data: product.upc, barcode: Barcode.ean13()))):Container(),
-                            Expanded(flex:3,child: Container(),),
-                          ],
                         ),
-                        IconButton(icon: Icon(Icons.download_rounded),onPressed: ()async{
-                          print(Barcode.ean13().isValid(product.upc));
+                      SizedBox(height: 10,),
 
-                        //  buildBarcode(Barcode.ean13(), "7506304311925");
-                          *//*if(kIsWeb){
-                            final image = Image(600, 350);
+                       selectedWidget,
+                       // Dimensions(dimensions: product.dimensions,)
+                      //Bullets(bullets:product.bullets),
+                    ],)),
+                    Expanded(flex:2,child: Container()),
+                    Expanded(flex: 14,
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 40,),
+                         // Container(child: Text("$sgroup"),),
+                          Stack(children: [
 
-                            // Fill it with a solid color (white)
-                            fill(image, getColor(255, 255, 255));
+                            Positioned(top: 0,right: 70,
+                              child: IconButton(icon: Icon(Icons.edit,color: Colors.blue,),onPressed:()async
+                               {
+                                 Map m=new Map();
+                                 m['model']=product.model;
+                                 print('pre');
+                                  await Navigator.pushNamed(context, "/imageEditor",arguments: m);
 
-                            // Draw the barcode
-                            drawBarcode(image, Barcode.code128(), 'Test', font: arial_24);
+                                   print('post');
+                                 product= await  downloadProduct(product.model);
 
-                            // Save the image
-                            File('barcode.png').writeAsBytesSync(encodePng(image));
-                          }
-                          else{
+                                 print(product.photos);
 
-                          }*//*
-                           //   buildBarcode(Barcode.ean13(), "7506304311925",filename: "bc_7506304311925",height: 200,width: 400,fontHeight: 20);
-                        },),*/
-                      ],
+                              },),
+                            ),
+
+                            Container(padding:EdgeInsets.all(40),child: Carousel(urls:product.photos))]),
+
+                         /* Row(
+                            children: [
+                              Expanded(flex:3,child: Container(),),
+                              product.upc!=null?kIsWeb?Expanded(flex:3,child: Container(width: 10,child: BarcodeWidget(data: product.upc, barcode: Barcode.ean13()))):Expanded(flex:7,child: Container(width: 10,child: BarcodeWidget(data: product.upc, barcode: Barcode.ean13()))):Container(),
+                              Expanded(flex:3,child: Container(),),
+                            ],
+                          ),
+                          IconButton(icon: Icon(Icons.download_rounded),onPressed: ()async{
+                            print(Barcode.ean13().isValid(product.upc));
+
+                          //  buildBarcode(Barcode.ean13(), "7506304311925");
+                            *//*if(kIsWeb){
+                              final image = Image(600, 350);
+
+                              // Fill it with a solid color (white)
+                              fill(image, getColor(255, 255, 255));
+
+                              // Draw the barcode
+                              drawBarcode(image, Barcode.code128(), 'Test', font: arial_24);
+
+                              // Save the image
+                              File('barcode.png').writeAsBytesSync(encodePng(image));
+                            }
+                            else{
+
+                            }*//*
+                             //   buildBarcode(Barcode.ean13(), "7506304311925",filename: "bc_7506304311925",height: 200,width: 400,fontHeight: 20);
+                          },),*/
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(flex:1,child: Container()),
-                ],
-              ),
-            ],
+                    Expanded(flex:1,child: Container()),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
 
+        ),
       )
 
 
@@ -302,11 +304,12 @@ Future<Product> downloadProduct(String model)async{
 
   Widget permissionsBar(){
 
+    bool mobile=false;
 
     Map<String,Widget> widgets=new Map<String,Widget>();
     widgets['Características']=Bullets(bullets:product.bullets,edit: permissions["Características"]>1,model: product.model,);
     widgets['Medidas']=Dimensions(dimensions:product.dimensions,edit: permissions["Medidas"]>1?true:false);
-    widgets['Código de Barras']=BCode(upc:product.upc,edit: permissions["Código de Barras"]>1?true:false);
+    widgets['Código de Barras']=BCode(upc:product.upc,edit: permissions["Código de Barras"]>1?true:false,mobile: mobile,);
     widgets['Usuarios']=Users();
 
     List l0=permissions.keys.toList();

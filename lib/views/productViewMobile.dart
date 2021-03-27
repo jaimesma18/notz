@@ -37,6 +37,8 @@ class _ProductViewMobileState extends State<ProductViewMobile> {
   //String model="LC-1192";
   Product product;
   TextEditingController search= new TextEditingController();
+  ScrollController scroller=new ScrollController();
+
 
 
 
@@ -120,7 +122,7 @@ Future<Product> downloadProduct(String model)async{
       SingleChildScrollView(scrollDirection: Axis.vertical,child:
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               /*Padding(
                 padding: const EdgeInsets.fromLTRB(34, 8, 0, 14),
@@ -316,6 +318,7 @@ Future<Product> downloadProduct(String model)async{
 
 
   Widget permissionDrawer() {
+    bool mobile=true;
     Map<String, Widget> widgets = new Map<String, Widget>();
     widgets['Características'] = Bullets(bullets: product.bullets,
       edit: permissions["Características"] > 1,
@@ -323,7 +326,7 @@ Future<Product> downloadProduct(String model)async{
     widgets['Medidas'] = Dimensions(dimensions: product.dimensions,
         edit: permissions["Medidas"] > 1 ? true : false);
     widgets['Código de Barras'] = BCode(upc: product.upc,
-        edit: permissions["Código de Barras"] > 1 ? true : false);
+        edit: permissions["Código de Barras"] > 1 ? true : false,mobile: mobile,);
     widgets['Usuarios'] = Users();
 
     List l0 = permissions.keys.toList();

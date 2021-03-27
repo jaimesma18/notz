@@ -27,6 +27,7 @@ class _BulletsState extends State<Bullets> {
   String editingBullet="";
   int editingBulletIndex=-1;
   ScrollController scroller=new ScrollController();
+  ScrollController scroller2=new ScrollController();
 
 
 
@@ -237,7 +238,7 @@ for(var x in bullets){
                       doneEditing();
                       setState(() {
                         bullets.add("");
-                        scroller.jumpTo(scroller.position.maxScrollExtent+130);
+                        scroller.jumpTo(scroller.position.maxScrollExtent+200);
                      // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
                       });
 
@@ -318,70 +319,68 @@ for(var x in bullets){
        });
      },):Container(),*/
     widget.edit?SizedBox(height: 10,):Container(),
-          SingleChildScrollView(
-            child: !editing?Container(height: 400,width: 800,
-              child: ListView.builder(itemCount:bullets.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [Expanded(flex:2,child: FlatButton(child: Text("\u2022",style: TextStyle(fontSize: 24),),onPressed: (){Clipboard.setData(new ClipboardData(text:bullets[index]));},)),
-                          Expanded(flex:1,child: Container()),
-                          Expanded(flex:28,child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0,4,0,0),
-                            child: new SelectableText(bullets[index]),
-                          )),
-                        ],
-                      ),
-                    );
-                  }),
-            ):
-
-            Container(height: 400,width: 800, child:
-            /*ListView.builder(itemCount:bullets.length,
+          !editing?Container(width: 800,
+            child: ListView.builder(controller: scroller2,
+                itemCount:bullets.length,shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
-                      children: [
-                        Expanded(flex:2,child: IconButton(icon: Icon(Icons.drag_handle,),onPressed: (){},)),
-                        Expanded(flex:2,child: IconButton(icon: Icon(Icons.delete,),onPressed: (){},)),
+                      children: [Expanded(flex:3,child: FlatButton(
+                        child: Text("\u2022",style: TextStyle(fontSize: 24),),onPressed: (){Clipboard.setData(new ClipboardData(text:bullets[index]));},)),
                         Expanded(flex:1,child: Container()),
-                        Expanded(flex:28,child: Padding(
+                        Expanded(flex:33,child: Padding(
                           padding: const EdgeInsets.fromLTRB(0,4,0,0),
-                          child: new TextField(style:TextStyle(fontSize: 14),controller: new TextEditingController(text: bullets[index]),),
+                          child: new SelectableText(bullets[index]),
                         )),
                       ],
                     ),
                   );
-                }),*/
+                }),
+          ):
 
-              ReorderableWrap(controller: scroller,
-                direction:Axis.vertical ,
-                  needsLongPressDraggable: isMobile,
-                  spacing: 8.0,
-                  runSpacing: 4.0,
-                  padding: const EdgeInsets.all(0),
-                 // maxMainAxisCount: 1,
-                  children: _tiles,
-                  onReorder: _onReorder,
-                  onNoReorder: (int index) {
-                    doneEditing();
-                    setState(() {
+          Container(width: 800, child:
+          /*ListView.builder(itemCount:bullets.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Expanded(flex:2,child: IconButton(icon: Icon(Icons.drag_handle,),onPressed: (){},)),
+                      Expanded(flex:2,child: IconButton(icon: Icon(Icons.delete,),onPressed: (){},)),
+                      Expanded(flex:1,child: Container()),
+                      Expanded(flex:28,child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0,4,0,0),
+                        child: new TextField(style:TextStyle(fontSize: 14),controller: new TextEditingController(text: bullets[index]),),
+                      )),
+                    ],
+                  ),
+                );
+              }),*/
 
-                    });
-                    print(index);
-                    //this callback is optional
-                    debugPrint('${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
-                  },
-                  onReorderStarted: (int index) {
-                    //this callback is optional
-                    debugPrint('${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
-                  }
-              ),
-            )
+            ReorderableWrap(controller: scroller,
+              direction:Axis.vertical ,
+                needsLongPressDraggable: isMobile,
+                spacing: 8.0,
+                runSpacing: 4.0,
+                padding: const EdgeInsets.all(0),
+               // maxMainAxisCount: 1,
+                children: _tiles,
+                onReorder: _onReorder,
+                onNoReorder: (int index) {
+                  doneEditing();
+                  setState(() {
 
-            ,
+                  });
+                  print(index);
+                  //this callback is optional
+                  debugPrint('${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
+                },
+                onReorderStarted: (int index) {
+                  //this callback is optional
+                  debugPrint('${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
+                }
+            ),
           ),
         ],
       )
