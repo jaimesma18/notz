@@ -97,7 +97,7 @@ Future<Product> downloadProduct(String model)async{
           product = data['product'];
 
           selectedWidget = Bullets(bullets: product
-              .bullets,edit: permissions[selectedWidgetText]>1,model: product.model,);
+              .bullets,edit: permissions[selectedWidgetText]>1,model: product.model,mobile: true,);
 
           loaded = true;
         }
@@ -322,7 +322,7 @@ Future<Product> downloadProduct(String model)async{
     Map<String, Widget> widgets = new Map<String, Widget>();
     widgets['Características'] = Bullets(bullets: product.bullets,
       edit: permissions["Características"] > 1,
-      model: product.model,);
+      model: product.model,mobile:mobile);
     widgets['Medidas'] = Dimensions(dimensions: product.dimensions,
         edit: permissions["Medidas"] > 1 ? true : false);
     widgets['Código de Barras'] = BCode(upc: product.upc,

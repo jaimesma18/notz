@@ -10,7 +10,9 @@ class Bullets extends StatefulWidget {
   List bullets;
   bool edit;
   String model;
-  Bullets({this.bullets,this.edit,this.model});
+  bool mobile;
+  Function f;
+  Bullets({this.bullets,this.edit,this.model,this.mobile});
   @override
   _BulletsState createState() => _BulletsState();
 }
@@ -28,6 +30,7 @@ class _BulletsState extends State<Bullets> {
   int editingBulletIndex=-1;
   ScrollController scroller=new ScrollController();
   ScrollController scroller2=new ScrollController();
+  bool isMobile;//=false;
 
 
 
@@ -41,22 +44,17 @@ for(var x in bullets){
   initialState.add(x);
 }
 
+if(widget.mobile!=null){
+  isMobile=widget.mobile;
+}
+print("mov");
+print(isMobile);
 //addState();
     super.initState();
   }
 
 
-  void _onReorder(int oldIndex, int newIndex) {
-    doneEditing();
-    dynamic old=bullets.removeAt(oldIndex);
-    bullets.insert(newIndex, old);
 
-    setState(() {
-      buildTiles();
-    });
-    addState();
-
-  }
 
   void addState(){
     List temp=[];
@@ -78,8 +76,17 @@ for(var x in bullets){
   }
 
 
-  void buildTiles({bool onSave}){
+  void buildTiles({bool onSave,double width}){
 
+    double w=780;
+    int exp=2;
+    int dif=0;
+
+    if(isMobile){
+      w=width;
+      exp=3;
+      dif=20;
+    }
     _tiles.clear();
     controllers.clear();
     for(int i=0;i<bullets.length;i++){
@@ -108,16 +115,16 @@ for(var x in bullets){
 
         _tiles.add(
 
-            Container(width: 780,
+            Container(width: w-dif,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   children: [
-                    Expanded(flex:2,child: IconButton(icon: Icon(Icons.drag_handle,),onPressed: (){
+                    Expanded(flex:exp,child: IconButton(icon: Icon(Icons.drag_handle,),onPressed: (){
 
 
                     },)),
-                    Expanded(flex:2,child: IconButton(icon: Icon(Icons.delete,),onPressed: (){
+                    Expanded(flex:exp,child: IconButton(icon: Icon(Icons.delete,),onPressed: (){
                       doneEditing();
                       setState(() {
 
@@ -128,18 +135,23 @@ for(var x in bullets){
                     Expanded(flex:1,child: Container()),
                     Expanded(flex:28,child: Padding(
                       padding: const EdgeInsets.fromLTRB(0,4,0,0),
-                      child: SingleChildScrollView(scrollDirection: Axis.horizontal ,
-                        child: Container(width: 770,
-                          child: new TextField(focusNode:focusNode,maxLines:null,style:TextStyle(fontSize: 14),controller: tc,onChanged: (val){
-                          //bullets[i]=val;
-                            editingBulletIndex=i;
-                          //  addState();
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Container(
+                          width: 400,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                            child: new TextField(keyboardType: TextInputType.multiline,focusNode:focusNode,maxLines:null,style:TextStyle(fontSize: 14),controller: tc,onChanged: (val){
+                            //bullets[i]=val;
+                              editingBulletIndex=i;
+                            //  addState();
                          editingBullet=val;
 
-                          },
+                            },
                         ),
-                      ),
-                    )),),
+                          ),
+                        ),
+                      )),),
                   ],
                 ),
               ),
@@ -152,11 +164,23 @@ for(var x in bullets){
   @override
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
-    bool isMobile;
+   // bool isMobile;
     deviceWidth>=768?isMobile=false:isMobile=true;
 
+    void _onReorder(int oldIndex, int newIndex) {
+      doneEditing();
+      dynamic old=bullets.removeAt(oldIndex);
+      bullets.insert(newIndex, old);
+
+      setState(() {
+        buildTiles(width: deviceWidth);
+      });
+      addState();
+
+    }
+
     if(editing) {
-      buildTiles();
+      buildTiles(width: deviceWidth);
     }
 
 
@@ -360,7 +384,7 @@ for(var x in bullets){
 
             ReorderableWrap(controller: scroller,
               direction:Axis.vertical ,
-                needsLongPressDraggable: isMobile,
+                needsLongPressDraggable:isMobile,
                 spacing: 8.0,
                 runSpacing: 4.0,
                 padding: const EdgeInsets.all(0),
