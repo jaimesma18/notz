@@ -26,6 +26,7 @@ class _BulletsState extends State<Bullets> {
   stk.Stack<List> redo=stk.Stack();
   String editingBullet="";
   int editingBulletIndex=-1;
+  ScrollController scroller=new ScrollController();
 
 
 
@@ -236,8 +237,11 @@ for(var x in bullets){
                       doneEditing();
                       setState(() {
                         bullets.add("");
+                        scroller.jumpTo(scroller.position.maxScrollExtent+130);
                      // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
                       });
+
+
                     },):IconButton(icon:Icon(Icons.add_circle,color:Colors.blue,size: 36,),onPressed: (){
                       doneEditing();
                       setState(() {
@@ -352,7 +356,7 @@ for(var x in bullets){
                   );
                 }),*/
 
-              ReorderableWrap(
+              ReorderableWrap(controller: scroller,
                 direction:Axis.vertical ,
                   needsLongPressDraggable: isMobile,
                   spacing: 8.0,

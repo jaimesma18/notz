@@ -11,6 +11,8 @@ import 'package:reorderables/reorderables.dart';
 
 class ImageUploader extends StatefulWidget {
   @override
+  String model;
+  ImageUploader({this.model});
 
   _ImageUploaderState createState() => _ImageUploaderState();
 }
@@ -26,12 +28,13 @@ final double _iconSize = 90;
 List<Widget> _tiles=[];
 bool attaching=false;
 String ordenar="Ordenar";
+bool enabledButton=false;
 
   @override
   void initState() {
     super.initState();
 
-    model="LC-1192";
+    model=widget.model;
     init();
 
 
@@ -51,27 +54,30 @@ String ordenar="Ordenar";
         ,height: 100,),)  ;*/
 
       _tiles.add(
-        Stack(children: [
-          Image.network(x
-          ,height: 100,),
-          Positioned(top: 0,right: 0,
-            child: IconButton(icon: Icon(Icons.clear),iconSize: 10,onPressed: ()async{
-              print(photosNames[x]);
-              await StorageManager().deleteCloudFile("productos/$model/${photosNames[x]}");
+        Padding(
+          padding: const EdgeInsets.fromLTRB(5,0,5,0),
+          child: Stack(children: [
+            Image.network(x
+            ,height: 100,),
+            Positioned(top: 0,right: -10,
+              child: IconButton(icon: Icon(Icons.clear,color: Colors.blue,size: 16,),onPressed: ()async{
+                print(photosNames[x]);
+                await StorageManager().deleteCloudFile("productos/$model/${photosNames[x]}");
 
 
-                photosNames.remove(x);
-                photos.remove(x);
+                  photosNames.remove(x);
+                  photos.remove(x);
 
 
-              await DatabaseService().updateProduct(model,photos: photos, photosNames: photosNames);
-              init();
+                await DatabaseService().updateProduct(model,photos: photos, photosNames: photosNames);
+                init();
 
 
-            },)
-          ),
+              },)
+            ),
 
-        ],));
+          ],),
+        ));
 
 
     }
@@ -102,6 +108,7 @@ String ordenar="Ordenar";
       setState(() {
         Widget row = _tiles.removeAt(oldIndex);
         _tiles.insert(newIndex, row);
+        enabledButton=true;
       });
     }
 
@@ -139,6 +146,7 @@ String ordenar="Ordenar";
                     ordenar="Subir";
                     height=8;
                     attached = "Se adjunto ${filePickerResult.files[0].name}";
+                    enabledButton=true;
                   });
                 }
                 else{
@@ -155,51 +163,54 @@ String ordenar="Ordenar";
 
            Padding(
              padding:  EdgeInsets.fromLTRB(0, height, 0, 0),
-             child: RaisedButton(color:Colors.blue,child: Text(ordenar,style: TextStyle(color: Colors.white),),onPressed: ()async{
+             child: Opacity(opacity: enabledButton?1:0.3,
+               child: RaisedButton(color:Colors.blue,child: Text(ordenar,style: TextStyle(color: Colors.white),),onPressed:!enabledButton?null: ()async{
 
 
-               if(attaching){
-               if(filePickerResult.files.isNotEmpty){
-                 String name=filePickerResult.files[0].name;
-                 int size=filePickerResult.files[0].size;
-                 print(size);
-                 if(!photosNames.containsValue(name)) {
-                   StorageManager sm = new StorageManager();
-                   Map<String, String> m = new Map();
-                   m['contentType'] = "image/jpeg";
-                   TaskSnapshot res = await sm.uploadRaw(
-                       filePickerResult.files[0].bytes,
-                       "/productos/$model/$name", contentType: "image/jpeg");
+                 if(attaching){
+                 if(filePickerResult.files.isNotEmpty){
+                   String name=filePickerResult.files[0].name;
+                   int size=filePickerResult.files[0].size;
+                   print(size);
+                   if(!photosNames.containsValue(name)) {
+                     StorageManager sm = new StorageManager();
+                     Map<String, String> m = new Map();
+                     m['contentType'] = "image/jpeg";
+                     TaskSnapshot res = await sm.uploadRaw(
+                         filePickerResult.files[0].bytes,
+                         "/productos/$model/$name", contentType: "image/jpeg");
 
-                   Reference storageRef = FirebaseStorage.instance.ref(
-                       res.metadata.fullPath);
-                   storageRef.getDownloadURL().then((value) async {
-                     photos.add(value);
-                     photosNames[value] = name;
-                     await DatabaseService().updateProduct(model,
-                         photos: photos, photosNames: photosNames);
-                     await init();
-                   });
-                   setState(() {
-                     attaching = false;
-                     ordenar = "Ordenar";
-                   });
-                 }
+                     Reference storageRef = FirebaseStorage.instance.ref(
+                         res.metadata.fullPath);
+                     storageRef.getDownloadURL().then((value) async {
+                       photos.add(value);
+                       photosNames[value] = name;
+                       await DatabaseService().updateProduct(model,
+                           photos: photos, photosNames: photosNames);
+                       await init();
+                     });
+                     setState(() {
+                       attaching = false;
+                       ordenar = "Ordenar";
+                       enabledButton=false;
+                     });
+                   }
+                   else{
+                     print("existe");
+                   }
+
+
+
+                 }}
                  else{
-                   print("existe");
+                   await DatabaseService().updateProduct(model,photos: photos, photosNames: photosNames);
+
+                     await init();
+
                  }
 
-
-
-               }}
-               else{
-                 await DatabaseService().updateProduct(model,photos: photos, photosNames: photosNames);
-
-                   await init();
-
-               }
-
-             },),
+               },),
+             ),
            ),
 
          ],),

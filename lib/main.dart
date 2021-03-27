@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notz/services/auth.dart';
 import 'package:notz/views/home.dart';
+import 'package:notz/views/imageEditor.dart';
 import 'package:notz/views/login.dart';
 import 'package:notz/views/productView.dart';
 import 'package:notz/views/passwordReset.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
           '/login':(context)=>Login(),
           '/resetPassword':(context)=>PasswordReset(),
           '/upload':(context)=>UploadProduct(),
+          '/imageEditor':(context)=>ImageEditor(),
           '/tester':(context)=>Tester(),
 
 
