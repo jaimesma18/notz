@@ -38,7 +38,7 @@ dependencies:
   flutter_typeahead: ^2.0.0
   file_picker: ^2.1.6
   reorderables: ^0.3.2
-
+  image_gallery_saver: ^1.6.8
 
 
 

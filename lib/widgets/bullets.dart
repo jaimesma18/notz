@@ -262,7 +262,7 @@ print(isMobile);
                       doneEditing();
                       setState(() {
                         bullets.add("");
-                        scroller.jumpTo(scroller.position.maxScrollExtent+200);
+                        scroller.jumpTo(scroller.position.maxScrollExtent+120);
                      // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
                       });
 

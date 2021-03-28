@@ -119,8 +119,9 @@ Future<Product> downloadProduct(String model)async{
           },)*/
         ],),
       body: product==null||permissions==null?Container():
-      Scrollbar(isAlwaysShown: true,controller: scroller,
-        child: SingleChildScrollView(scrollDirection: Axis.vertical,child:
+      //Scrollbar(isAlwaysShown: true,controller: scroller,
+       // child:
+      SingleChildScrollView(scrollDirection: Axis.vertical,child:
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,7 +235,7 @@ Future<Product> downloadProduct(String model)async{
           ),
 
         ),
-      )
+      //)
 
 
     );
