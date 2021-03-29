@@ -67,63 +67,7 @@ class _BCodeState extends State<BCode> {
   void downloadBarcodes(String data,{double w,double h})async{
 
    BarcodeAbs.instance.downloadBarcode(data);
-   // barcodeStub.downloadBarcode(data);
-    /*if(kIsWeb) {
-      barcodeStub.downloadBarcode(data);
-    }
-
-    if(Platform.isAndroid){
-      barcodeStub.downloadBarcode(data);
-    }*/
-
-
-/*
-
-    final image =  img.Image(300, 200);
-
-// Fill it with a solid color (white)
-    img.fill(image, img.getColor(255, 255, 255));
-// Draw the barcode
-
-    drawBarcode(image, Barcode.ean13(), data,width: 280,x: 10,font: img.arial_14,textPadding:2 );
-
-    if(kIsWeb){
-
-      webServices.WebFunctions().downloadBarcode(data);
-     */
-/* print("Web");
-      final _base64 = base64Encode(img.encodePng(image));
-      final anchor =
-      html.AnchorElement(href: 'data:application/octet-stream;base64,$_base64')
-        ..target = 'blank';
-      // add the name
-      if ("$data.png" != null) {
-        anchor.download = "$data.png";
-      }
-      // trigger download
-      html.document.body.append(anchor);
-      anchor.click();
-      anchor.remove();
-      return;*//*
-
-    }
-
-    else{
-      if(Platform.isAndroid) {
-        var appDocDir = await getTemporaryDirectory();
-        String savePath = appDocDir.path + "/$data.png";
-        File(savePath)..writeAsBytesSync(img.encodePng(image));
-        print("Android");
-        final result = await ImageGallerySaver.saveFile(savePath);
-      }
-    }
-
-
-    //File(myImagePath+'/$data.png')..writeAsBytesSync(img.encodePng(image));
-*/
-
-
-
+  
   }
   void buildBarcode(
       Barcode bc,
