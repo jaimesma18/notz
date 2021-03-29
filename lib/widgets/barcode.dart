@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:typed_data';
@@ -8,12 +7,16 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_image/barcode_image.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+//import 'package:path_provider/path_provider.dart';
+//import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:html' as html;
-import 'dart:convert';
-
+import 'package:notz/services/barcodeServices/androidFunctions.dart';
+import 'package:notz/services/barcodeServices/barcodeStub.dart';
+import 'package:notz/services/barcodeServices/barcodeAbstract.dart';
+//import 'package:notz/services/webFunctions.dart';
+//import 'package:notz/services/androidFunctions.dart';
+//import 'package:notz/services/webFunctions.dart' as webServices if (dart.library.js) 'package:notz/services/androidFunctions.dart';
+//import 'package:notz/services/barcodeStub.dart' if (dart.library.js)'package:notz/services/webFunctions.dart' as webServices;
 
 
 
@@ -29,6 +32,7 @@ class BCode extends StatefulWidget {
 
 class _BCodeState extends State<BCode> {
   @override
+  String upc;
   CrossAxisAlignment _crossAlignment=CrossAxisAlignment.start;
   MainAxisAlignment _mainAlignment=MainAxisAlignment.start;
 
@@ -36,6 +40,7 @@ class _BCodeState extends State<BCode> {
   @override
   void initState() {
     super.initState();
+    upc=widget.upc;
 
     if(widget.mobile!=null){
       if(widget.mobile){
@@ -59,7 +64,20 @@ class _BCodeState extends State<BCode> {
   }
 
 
-  void downloadBarcode(String data,{double w,double h})async{
+  void downloadBarcodes(String data,{double w,double h})async{
+
+   BarcodeAbs.instance.downloadBarcode(data);
+   // barcodeStub.downloadBarcode(data);
+    /*if(kIsWeb) {
+      barcodeStub.downloadBarcode(data);
+    }
+
+    if(Platform.isAndroid){
+      barcodeStub.downloadBarcode(data);
+    }*/
+
+
+/*
 
     final image =  img.Image(300, 200);
 
@@ -69,11 +87,11 @@ class _BCodeState extends State<BCode> {
 
     drawBarcode(image, Barcode.ean13(), data,width: 280,x: 10,font: img.arial_14,textPadding:2 );
 
-
-
-
     if(kIsWeb){
-      print("Web");
+
+      webServices.WebFunctions().downloadBarcode(data);
+     */
+/* print("Web");
       final _base64 = base64Encode(img.encodePng(image));
       final anchor =
       html.AnchorElement(href: 'data:application/octet-stream;base64,$_base64')
@@ -86,7 +104,8 @@ class _BCodeState extends State<BCode> {
       html.document.body.append(anchor);
       anchor.click();
       anchor.remove();
-      return;
+      return;*//*
+
     }
 
     else{
@@ -101,6 +120,7 @@ class _BCodeState extends State<BCode> {
 
 
     //File(myImagePath+'/$data.png')..writeAsBytesSync(img.encodePng(image));
+*/
 
 
 
@@ -136,12 +156,12 @@ class _BCodeState extends State<BCode> {
               Row(mainAxisAlignment: _mainAlignment,
                 children: [
                   Text("UPC: ",style: TextStyle(fontWeight: FontWeight.bold),),
-                  FlatButton(child:Text(widget.upc),onPressed: (){Clipboard.setData(new ClipboardData(text:widget.upc));},padding: EdgeInsets.zero,),
+                  FlatButton(child:Text(upc),onPressed: (){Clipboard.setData(new ClipboardData(text:upc));},padding: EdgeInsets.zero,),
                 ],
               ),
               SizedBox(height: 10,),
-              widget.upc!=null?Container(width: 300,child: BarcodeWidget(data: widget.upc, barcode: Barcode.ean13())):Container(),
-            kIsWeb||Platform.isAndroid?IconButton(icon:Icon(Icons.download_sharp),onPressed: ()=>downloadBarcode(widget.upc)):Container(),
+              upc!=null?Container(width: 300,child: BarcodeWidget(data: upc, barcode: Barcode.ean13())):Container(),
+            kIsWeb||Platform.isAndroid?IconButton(icon:Icon(Icons.download_sharp),onPressed: ()=>downloadBarcodes(upc)):Container(),
             ],
           ),
         ),

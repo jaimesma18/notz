@@ -39,6 +39,7 @@ dependencies:
   file_picker: ^2.1.6
   reorderables: ^0.3.2
   image_gallery_saver: ^1.6.8
+  universal_html: ^1.2.4
 
 
 
