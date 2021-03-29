@@ -21,7 +21,7 @@ final image =  img.Image(300, 200);
 img.fill(image, img.getColor(255, 255, 255));
 // Draw the barcode
 
-drawBarcode(image, Barcode.ean13(), data,width: 280,x: 10,font: img.arial_14,textPadding:2 );
+drawBarcode(image, Barcode.ean13(), data,width: 280,x: 10,font: img.arial_14,textPadding:2 );//height:190,y:5
 
 var appDocDir = await getTemporaryDirectory();
 String savePath = appDocDir.path + "/$data.png";

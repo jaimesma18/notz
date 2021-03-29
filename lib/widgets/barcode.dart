@@ -7,25 +7,19 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_image/barcode_image.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
-//import 'package:path_provider/path_provider.dart';
-//import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:notz/services/barcodeServices/androidFunctions.dart';
-import 'package:notz/services/barcodeServices/barcodeStub.dart';
+import 'package:notz/classes/Product.dart';
 import 'package:notz/services/barcodeServices/barcodeAbstract.dart';
-//import 'package:notz/services/webFunctions.dart';
-//import 'package:notz/services/androidFunctions.dart';
-//import 'package:notz/services/webFunctions.dart' as webServices if (dart.library.js) 'package:notz/services/androidFunctions.dart';
-//import 'package:notz/services/barcodeStub.dart' if (dart.library.js)'package:notz/services/webFunctions.dart' as webServices;
-
+import 'package:notz/services/db.dart';
 
 
 
 class BCode extends StatefulWidget {
+  String model;
   String upc;
   bool edit;
   bool mobile;
-  BCode({this.upc,this.edit,this.mobile});
+  BCode({this.model,this.upc,this.edit,this.mobile});
   @override
   _BCodeState createState() => _BCodeState();
 }
@@ -33,6 +27,9 @@ class BCode extends StatefulWidget {
 class _BCodeState extends State<BCode> {
   @override
   String upc;
+  bool editing=false;
+  bool downloading=false;
+  TextEditingController controller=new TextEditingController();
   CrossAxisAlignment _crossAlignment=CrossAxisAlignment.start;
   MainAxisAlignment _mainAlignment=MainAxisAlignment.start;
 
@@ -40,8 +37,8 @@ class _BCodeState extends State<BCode> {
   @override
   void initState() {
     super.initState();
-    upc=widget.upc;
-
+    upc=widget.upc??"";
+    controller.text=upc;
     if(widget.mobile!=null){
       if(widget.mobile){
         _crossAlignment=CrossAxisAlignment.center;
@@ -63,11 +60,21 @@ class _BCodeState extends State<BCode> {
     return completer.future;
   }
 
+  Future<bool> upcExists(String upc)async{
+    bool res=false;
+    if(upc!=null&&upc.isNotEmpty) {
+      Product product=await DatabaseService().productFromUPC(upc);
+      if(product!=null){
+        res=true;
+      }
+    }
+    return res;
+  }
 
   void downloadBarcodes(String data,{double w,double h})async{
 
    BarcodeAbs.instance.downloadBarcode(data);
-  
+
   }
   void buildBarcode(
       Barcode bc,
@@ -100,12 +107,62 @@ class _BCodeState extends State<BCode> {
               Row(mainAxisAlignment: _mainAlignment,
                 children: [
                   Text("UPC: ",style: TextStyle(fontWeight: FontWeight.bold),),
-                  FlatButton(child:Text(upc),onPressed: (){Clipboard.setData(new ClipboardData(text:upc));},padding: EdgeInsets.zero,),
+                  SizedBox(width: 6,),
+                  !editing?FlatButton(child:Text(upc),onPressed: (){Clipboard.setData(new ClipboardData(text:upc));},padding: EdgeInsets.zero,):
+                  Container(child: TextField(controller: controller,style: TextStyle(fontSize: 14),textAlign: TextAlign.center,),width: 120,),
+                  SizedBox(width: 10,),
+                  widget.edit?FlatButton.icon(icon:Icon(!editing?Icons.edit:Icons.check_circle_outline,color:!editing?Colors.blue:Colors.green),label: Text(!editing?"Editar":"Confirmar",style: TextStyle(color: !editing?Colors.blue:Colors.green,),),onPressed: ()async{
+                    // addState();
+                    print(editing);
+
+                      if(editing) {
+                        if(upc==controller.text){
+                          setState(() {
+                            editing = !editing;
+                          });
+
+                        }
+                        else{
+                          bool exists=await upcExists(controller.text);
+                          if (!exists && controller.text.length == 13 && Barcode
+                              .ean13().isValid(controller.text)) {
+                            setState(() {
+                              upc = controller.text;
+                            });
+
+                            await DatabaseService().updateProduct(widget.model,upc:upc);
+                            setState(() {
+                              editing = !editing;
+                            });
+
+
+                          }
+                        }
+
+                      }
+                      else{
+                        setState(() {
+                          editing = !editing;
+                        });
+
+                      }
+
+                  },):Container(),
                 ],
               ),
               SizedBox(height: 10,),
               upc!=null?Container(width: 300,child: BarcodeWidget(data: upc, barcode: Barcode.ean13())):Container(),
-            kIsWeb||Platform.isAndroid?IconButton(icon:Icon(Icons.download_sharp),onPressed: ()=>downloadBarcodes(upc)):Container(),
+            kIsWeb||Platform.isAndroid?IconButton(icon:Icon(downloading?Icons.download_done_outlined:Icons.download_sharp,color:downloading?Colors.green:Colors.blue ,),onPressed: ()async{
+              setState(() {
+               downloading=true;
+              });
+              downloadBarcodes(upc);
+              await Future.delayed(Duration(seconds: 3));
+              setState(() {
+                downloading=false;
+              });
+            })
+                :Container(),
             ],
           ),
         ),

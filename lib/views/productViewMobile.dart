@@ -325,7 +325,7 @@ Future<Product> downloadProduct(String model)async{
       model: product.model,mobile:mobile);
     widgets['Medidas'] = Dimensions(dimensions: product.dimensions,
         edit: permissions["Medidas"] > 1 ? true : false);
-    widgets['Código de Barras'] = BCode(upc: product.upc,
+    widgets['Código de Barras'] = BCode(model:product.model,upc: product.upc,
         edit: permissions["Código de Barras"] > 1 ? true : false,mobile: mobile,);
     widgets['Usuarios'] = Users();
 

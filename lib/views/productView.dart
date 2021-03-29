@@ -310,7 +310,7 @@ Future<Product> downloadProduct(String model)async{
     Map<String,Widget> widgets=new Map<String,Widget>();
     widgets['Características']=Bullets(bullets:product.bullets,edit: permissions["Características"]>1,model: product.model,mobile:mobile);
     widgets['Medidas']=Dimensions(dimensions:product.dimensions,edit: permissions["Medidas"]>1?true:false);
-    widgets['Código de Barras']=BCode(upc:product.upc,edit: permissions["Código de Barras"]>1?true:false,mobile: mobile,);
+    widgets['Código de Barras']=BCode(upc:product.upc,edit: permissions["Código de Barras"]>1?true:false,mobile: mobile,model:product.model,);
     widgets['Usuarios']=Users();
 
     List l0=permissions.keys.toList();

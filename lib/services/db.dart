@@ -91,6 +91,29 @@ Future<Product> getProducto(String model)async{
   return p;
 }
 
+Future<Product> productFromUPC(String upc)async{
+  List<Product> ps=[];
+  Product pr=null;
+  await  FirebaseFirestore.instance
+      .collection('products')
+      .where('upc', isEqualTo: upc)
+      .get()
+      .then((QuerySnapshot snapshot){
+    for (var x in snapshot.docs){
+      Product p=productFromDoc(x.data());
+      ps.add(p);
+    }
+
+  });
+
+
+  if(ps.isNotEmpty){
+    pr=ps[0];
+  }
+
+  return pr;
+}
+
 Future<List<Product>> queryProducts(String query)async{
   List<Product> ps=[];
   await  FirebaseFirestore.instance
