@@ -3,6 +3,7 @@ class User{
 
   String name;
   String lastname;
+  bool disabled;
   String area;
   String email;
   String uid;
@@ -12,7 +13,7 @@ class User{
 
 
 
-  User({this.email,this.permissions,this.name,this.area,this.lastname,this.uid,this.superuser});//,this.userManagement});
+  User({this.email,this.permissions,this.name,this.area,this.lastname,this.uid,this.superuser,this.disabled});//,this.userManagement});
 
 
 

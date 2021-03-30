@@ -23,3 +23,19 @@ export const createUser = functions.https.onCall((data) => {
         console.log("Error creating new user:", error);
       });
 });
+
+export const enableDisableUser = functions.https.onCall((data) => {
+  admin.auth().updateUser(data.uid, {
+    disabled: data.disabled,
+  }).then((userRecord) => {
+    const email=userRecord.email;
+    const statsDocumentReference = admin.firestore().doc("users/"+email);
+    return statsDocumentReference.update({disabled: data.disabled});
+    // See the UserRecord reference doc for the contents of userRecord.
+    // console.log("Successfully updated user", userRecord.toJSON());
+    // console.log(email);
+  })
+      .catch((error) => {
+        console.log("Error updating user:", error);
+      });
+});

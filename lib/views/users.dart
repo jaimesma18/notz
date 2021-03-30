@@ -43,7 +43,9 @@ class _UsersState extends State<Users> {
   bool loaded=false;
   int superuser=0;
   List<String>areas;
+  bool userDisabled=false;
   final _formKey = GlobalKey<FormState>();
+  String otherUid="";
   Map<String,int>viewsPermissions=new Map<String,int>();
 
 
@@ -81,6 +83,7 @@ class _UsersState extends State<Users> {
     // gMedidas = 0;
     name.text = "";
     lastname.text = "";
+    userDisabled=false;
     if(superuser==null||superuser>=2){
       area.text = "";
     }
@@ -141,6 +144,7 @@ class _UsersState extends State<Users> {
     DatabaseService().getUser(_auth.userInfo().email).then((value) => user=value);
 
 
+
     permissions=user.permissions;
     superuser=user.superuser;
      for(var x in permissions.keys){
@@ -174,6 +178,19 @@ class _UsersState extends State<Users> {
     uid=res.data;
     return uid;
   }
+
+  Future<void> disableUser(String uid,bool disable)async{
+    HttpsCallableOptions options=new HttpsCallableOptions(timeout: Duration(seconds: 10));
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('enableDisableUser',options: options);
+    Map m=new Map();
+    print("uid: $uid");
+    m['uid']=uid;
+    print("disabled? $disable");
+    m['disabled']=disable;
+    HttpsCallableResult res= await callable.call(m);
+
+  }
+
   bool isEmail(String email) {
     bool res = false;
     //bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
@@ -251,8 +268,10 @@ class _UsersState extends State<Users> {
           gFabricante = m['Fabricante'];
           gManual = m['Manual'];
           gMedidas = m['Medidas'];*/
+          otherUid=u.uid;
           name.text = u.name;
           lastname.text = u.lastname;
+          userDisabled=u.disabled;
           area.text = u.area;
           suser.text='${u.superuser}';
         }
@@ -332,7 +351,16 @@ class _UsersState extends State<Users> {
                         padding: const EdgeInsets.fromLTRB(60, 10, 20, 10),
                         child: Row(
                           children: [
-                            Expanded(flex: 10,
+                            superuser>=2?Expanded(flex: 1,child: Switch(activeColor:userDisabled?Colors.red:Colors.blue,activeTrackColor: userDisabled?Colors.red:Colors.blue,inactiveTrackColor: userDisabled?Colors.red:Colors.blue,inactiveThumbColor:userDisabled?Colors.red:Colors.blue,value: userDisabled,
+                            onChanged: (val)async{
+                             await disableUser(otherUid, val);
+                             setState(() {
+                               userDisabled=val;
+                             });
+                            },
+                            ),):Container(),
+                            superuser>=2?Expanded(flex: 1,child: Container(),):Container,
+                            Expanded(flex: 8,
                               child: TextField(
                                 controller: email,
                                 decoration: InputDecoration(

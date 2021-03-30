@@ -199,6 +199,7 @@ Future<User> getUser(String email)async{
 
       u.name= doc.data()['name'];
       u.lastname=doc.data()['lastname'];
+      u.disabled=doc.data()['disabled'];
       u.area=doc.data()['area'];
       u.email=doc.data()['email'];
      // u.userManagement=doc.data()['userManagement'];
