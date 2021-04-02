@@ -3,14 +3,21 @@ import 'package:universal_html/html.dart';
 
 class StringField extends StatefulWidget {
   String field;
-  Function(String val) callback;
+  TextEditingController controller;
+  Function callback;
   Function onRemove;
-  StringField({this.field,this.callback});
+  StringField({this.field,this.callback,this.controller});
   @override
   _StringFieldState createState() => _StringFieldState();
 }
 
 class _StringFieldState extends State<StringField> {
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
   @override
   Widget build(BuildContext context) {
     return Card(elevation: 5,
@@ -19,7 +26,7 @@ class _StringFieldState extends State<StringField> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.center,
             children: [
             Container(width: 198,padding: EdgeInsets.fromLTRB(10, 0, 10, 8),
-              child: TextField(autofocus: true,
+              child: TextField(controller: widget.controller,
                 maxLines:null,style: TextStyle(fontSize: 14,height: 1),
                 decoration: InputDecoration(labelText: widget.field,labelStyle: TextStyle(fontSize: 12),
                   enabledBorder: UnderlineInputBorder(
@@ -29,7 +36,7 @@ class _StringFieldState extends State<StringField> {
                     borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),onChanged: (val){
-                widget.callback(val);
+                  widget.callback();
               },),
             ),
             IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:12,icon: Icon(Icons.clear,color: Colors.blue),onPressed: widget.onRemove,),

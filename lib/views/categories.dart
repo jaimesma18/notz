@@ -104,8 +104,8 @@ Map<String,bool> enabledFields=new Map<String,bool>();
           }),
           Row(
             children: [
-              Expanded(child:buildTemplate()), //Column(children: template,)),
-              Expanded(child: buildFieldBox()),
+              Expanded(flex:10,child:buildTemplate2()), //Column(children: template,)),
+              Expanded(flex:6,child: buildFieldBox()),
             ],
           ),
 
@@ -117,16 +117,43 @@ Map<String,bool> enabledFields=new Map<String,bool>();
   }
 
   Widget createStringField(String field){
-    String callback(String val){
-      if(val.isNotEmpty) {
-        technical[field] = val;
+
+    TextEditingController controller=new TextEditingController();
+    controller.text=technical[field]??"";
+
+    callback(){
+
+      if(controller.text.isNotEmpty) {
+        technical[field] = controller.text;
       }
       else{
         technical.remove(field);
       }
+
+
+
     }
-    return StringField(field: field,callback: callback,);
+    return StringField(field: field,callback: callback,controller:controller,);
   }
+
+
+  Widget buildTemplate2(){
+    List l1=[];
+    for(var x in enabledFields.keys.toList()){
+      if(enabledFields[x]){
+        l1.add(x);
+      }
+    }
+
+    return GridView.count( shrinkWrap: true,
+      // Create a grid with 2 columns. If you change the scrollDirection to
+      // horizontal, this produces 2 rows.
+      crossAxisCount: 3,
+      // Generate 100 widgets that display their index in the List.
+      children: List.generate(l1.length, (int index) {
+        return  createStringField(l1[index]);
+      }));
+      }
 
 Widget buildTemplate(){
   List l1=[];
@@ -178,6 +205,7 @@ Widget buildTemplate(){
           if(!enabledFields[field]){
             technical.remove(field);
           }
+          FocusScope.of(context).requestFocus(FocusNode());
         });
       }),
       Text(field)
