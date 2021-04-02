@@ -17,8 +17,10 @@ Map<String,Category>cats=new Map<String,Category>();
 Map<String,Subcategory>subs=new Map<String,Subcategory>();
 Map technical=new Map();//Este es el que se va a usar para subir al producto
 Map<String,bool> enabledFields=new Map<String,bool>();
-List<Widget> allFields=[];
-List<Widget> template=[];//de los seleccionados
+//List<Widget> allFields=[];
+//List<Widget> template=[];//de los seleccionados
+
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +62,8 @@ List<Widget> template=[];//de los seleccionados
              subs.clear();
              subs=await DatabaseService().getSubcategories(cats[val].id);
              setState(() {
-               template=[];
+               enabledFields.clear();
+               //template=[];
                technical.clear();
                selectedCategory=val;
                if(subs.isNotEmpty) {
@@ -81,13 +84,14 @@ List<Widget> template=[];//de los seleccionados
             }).toList(),
             onChanged: (val) {
               setState(() {
-                template=[];
+               // template=[];
+                enabledFields.clear();
                 technical.clear();
                 selectedSubcategory=val;
 
               for(var x in subs[val].template.keys){
                 enabledFields[x]=true;
-                allFields.add(createFieldBoxTile(x));
+               // allFields.add(createFieldBoxTile(x));
                 //template.add(createStringField(x));
               }
               });
@@ -96,12 +100,12 @@ List<Widget> template=[];//de los seleccionados
           ),
           RaisedButton(child:Text("Click"),onPressed:(){
             print(enabledFields);
-            //print(technical);
+            print(technical);
           }),
           Row(
             children: [
-              Column(children: template,),
-              Column(children: allFields,),
+              Expanded(child:buildTemplate()), //Column(children: template,)),
+              Expanded(child: buildFieldBox()),
             ],
           ),
 
@@ -124,27 +128,60 @@ List<Widget> template=[];//de los seleccionados
     return StringField(field: field,callback: callback,);
   }
 
-  Widget createFieldBoxTile(String field){
+Widget buildTemplate(){
+  List l1=[];
+  for(var x in enabledFields.keys.toList()){
+    if(enabledFields[x]){
+      l1.add(x);
+    }
+  }
+
+  return ListView.builder(   scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+      itemCount: l1.length,
+      itemBuilder: (BuildContext ctxt, int index) {
+        return  createStringField(l1[index]);
+      });
+
+}
+
+  Widget buildFieldBox(){
+    List l1=[];
+    List l2=[];
+    l1=enabledFields.keys.toList();
+    for(var x in l1){
+      l2.add(enabledFields[x]);
+    }
+   return ListView.builder(   scrollDirection: Axis.vertical,
+       shrinkWrap: true,
+       itemCount: l1.length,
+       itemBuilder: (BuildContext ctxt, int index) {
+         return  createFieldBoxTile(l1[index],l2[index]);
+       });
+
+  }
+
+
+  Widget createFieldBoxTile(String field,bool enabled){
     Color c;
-    if(enabledFields[field]){
+    //if(enabledFields[field]){
+    if(enabled){
       c=Colors.green;
     }
     else{
       c=Colors.grey;
     }
-    return SingleChildScrollView(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        Row(children: [
-          IconButton(color: c,icon: Icon(Icons.check_circle_outline,), onPressed: (){
-            setState(() {
-              enabledFields[field]=!enabledFields[field];
-            });
-          }),
-          Text(field)
-        ],)
-      ],),
-    );
+    return Row(children: [
+      IconButton(color: c,icon: Icon(Icons.check_circle_outline,), onPressed: (){
+        setState(() {
+          enabledFields[field]=!enabledFields[field];
+          if(!enabledFields[field]){
+            technical.remove(field);
+          }
+        });
+      }),
+      Text(field)
+    ],);
   }
 
 

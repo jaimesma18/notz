@@ -19,7 +19,7 @@ class _StringFieldState extends State<StringField> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.center,
             children: [
             Container(width: 198,padding: EdgeInsets.fromLTRB(10, 0, 10, 8),
-              child: TextField(
+              child: TextField(autofocus: true,
                 maxLines:null,style: TextStyle(fontSize: 14,height: 1),
                 decoration: InputDecoration(labelText: widget.field,labelStyle: TextStyle(fontSize: 12),
                   enabledBorder: UnderlineInputBorder(
