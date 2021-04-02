@@ -113,7 +113,10 @@ if(!isMobile) {
     backgroundColor: Colors.white,
     appBar: AppBar(title: TextBox(isMobile),
       actions: [
-
+        IconButton(
+          icon: Icon(Icons.menu_book, size: 26), onPressed: () async {
+          Navigator.pushNamed(context, "/categories");
+        },),
         IconButton(
           icon: Icon(Icons.upload_sharp, size: 26), onPressed: () async {
           Navigator.pushNamed(context, "/tester");

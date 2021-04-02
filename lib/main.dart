@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notz/services/auth.dart';
+import 'package:notz/views/categories.dart';
 import 'package:notz/views/home.dart';
 import 'package:notz/views/imageEditor.dart';
 import 'package:notz/views/login.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
           '/upload':(context)=>UploadProduct(),
           '/imageEditor':(context)=>ImageEditor(),
           '/tester':(context)=>Tester(),
+          '/categories':(context)=>Categories(),
 
 
         },
