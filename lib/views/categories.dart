@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:notz/classes/category.dart';
-import 'package:notz/classes/subCategory.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/widgets/template/boolField.dart';
 import 'package:notz/widgets/template/stringField.dart';
@@ -15,7 +14,7 @@ bool loaded=false;
 String selectedCategory="";
 String selectedSubcategory="";
 Map<String,Category>cats=new Map<String,Category>();
-Map<String,Subcategory>subs=new Map<String,Subcategory>();
+Map<String,Category>subs=new Map<String,Category>();
 Map technical=new Map();//Este es el que se va a usar para subir al producto
 Map<String,bool> enabledFields=new Map<String,bool>();
 //List<Widget> allFields=[];
@@ -33,7 +32,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
 
   Future init()async{
 
-   cats=await DatabaseService().getCategories();
+   cats=await DatabaseService().getCategories(parent: null);
    if(cats.isNotEmpty) {
      selectedCategory = cats.keys.first ;
    }
@@ -61,7 +60,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
             }).toList(),
             onChanged: (val) async{
              subs.clear();
-             subs=await DatabaseService().getSubcategories(cats[val].id);
+             subs=await DatabaseService().getCategories(parent:cats[val].id);
              setState(() {
                enabledFields.clear();
                //template=[];

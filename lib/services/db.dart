@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notz/classes/Product.dart';
 import 'package:notz/classes/User.dart';
 import 'package:notz/classes/category.dart';
-import 'package:notz/classes/subCategory.dart';
 import 'package:notz/services/auth.dart';
 import 'package:notz/views/categories.dart';
 class DatabaseService{
@@ -356,36 +355,44 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
       .catchError((error) => print("Failed to update user: $error"));
 }
 
-Future<Map<String,Category>> getCategories()async{
+Future<Map<String,Category>> getCategories({String parent})async{
    Map<String,Category> m=new Map<String,Category>();
-  await  FirebaseFirestore.instance
-      .collection('categories')
-      .get()
-      .then((QuerySnapshot snapshot){
-    for (var x in snapshot.docs){
-      Category c=new Category(name: x.data()['name'],id:x.id);
-      m[c.name]=c;
-    }
 
-  });
+
+
+   if(parent==null) {
+     await FirebaseFirestore.instance
+         .collection('categories').where(
+         "parent", isNull: true)
+         .get()
+         .then((QuerySnapshot snapshot) {
+       for (var x in snapshot.docs) {
+         Category c = new Category(name: x.data()['name'],
+             id: x.id,
+             template: x.data()['template'],
+             parent: x.data()['parent']);
+         m[c.name] = c;
+       }
+     });
+   }
+   else{
+     await FirebaseFirestore.instance
+         .collection('categories').where(
+         "parent", isEqualTo: parent)
+         .get()
+         .then((QuerySnapshot snapshot) {
+       for (var x in snapshot.docs) {
+         Category c = new Category(name: x.data()['name'],
+             id: x.id,
+             template: x.data()['template'],
+             parent: x.data()['parent']);
+         m[c.name] = c;
+       }
+     });
+   }
 
   return m;
 }
 
-Future<Map<String,Subcategory>> getSubcategories(String category) async{
-  Map<String,Subcategory> m=new Map<String,Subcategory>();
-  await  FirebaseFirestore.instance
-      .collection('categories').doc(category).collection("sub")
-      .get()
-      .then((QuerySnapshot snapshot){
-    for (var x in snapshot.docs){
-      Subcategory sub=new Subcategory(name: x.data()['name'],id:x.id,parent: category,template: x.data()['technicals']);
-      m[sub.name]=sub;
-    }
-
-  });
-
-  return m;
-}
 
 }
