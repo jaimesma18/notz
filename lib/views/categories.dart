@@ -138,17 +138,23 @@ Map<String,bool> enabledFields=new Map<String,bool>();
 
   Widget createBoolField(String field){
 
-    List<bool> selected;
-    selected[0]=false;
-    selected[1]=true;
+    List<bool> selected=[];
+    selected.add(false);
+    selected.add(false);
 
     callback(){
-      technical[field]=selected[0];
+      if(selected[0]==selected[1]){
+        technical.remove(field);
+      }
+      else {
+        technical[field] = selected[0];
+      }
     }
     return BoolField(field: field,callback: callback,selected:selected);
   }
 
   Widget decideWidget(String field){
+
     if(subs[selectedSubcategory].template[field]=="string"){
       return createStringField(field);
     }
@@ -176,8 +182,8 @@ Map<String,bool> enabledFields=new Map<String,bool>();
         children: List.generate(l1.length, (int index) {
           return  Padding(
             padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-            //child: decideWidget(l1[index]),
-            child: createStringField(l1[index]),
+            child: decideWidget(l1[index]),
+            //child: createStringField(l1[index]),
           );
         })),
     );
