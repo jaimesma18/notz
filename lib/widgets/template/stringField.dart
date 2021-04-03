@@ -6,7 +6,8 @@ class StringField extends StatefulWidget {
   TextEditingController controller;
   Function callback;
   Function onRemove;
-  StringField({this.field,this.callback,this.controller,this.onRemove});
+  bool mandatory;
+  StringField({this.field,this.callback,this.controller,this.onRemove,this.mandatory});
   @override
   _StringFieldState createState() => _StringFieldState();
 }
@@ -40,10 +41,13 @@ class _StringFieldState extends State<StringField> {
                   ),
                 ),onChanged: (val){
                   widget.callback();
+                  setState(() {
+
+                  });
               },),
             ),
-              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: Colors.blue),)),
-              Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: Colors.blue),onPressed: widget.onRemove,))
+              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(widget.controller.text==null||widget.controller.text=="")?Colors.red:Colors.blue),)),
+              Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
           ],
           ),
         ),

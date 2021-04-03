@@ -99,6 +99,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
             },
           ),
           RaisedButton(child:Text("Click"),onPressed:(){
+            print("Valid?: ${validate()}");
             print(enabledFields);
             print(technical);
           }),
@@ -119,7 +120,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     );
   }
 
-  Widget createStringField(String field){
+  Widget createStringField(String field,{bool mandatory}){
 
     TextEditingController controller=new TextEditingController();
     controller.text=technical[field]??"";
@@ -129,7 +130,12 @@ Map<String,bool> enabledFields=new Map<String,bool>();
         technical[field] = controller.text;
       }
       else{
-        technical.remove(field);
+        if(mandatory){
+          technical[field]=null;
+        }
+        else {
+          technical.remove(field);
+        }
       }
     }
 
@@ -141,7 +147,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
       }
       technical.remove(field);
     }
-    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,);
+    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,mandatory: mandatory??false,);
   }
 
   Widget createBoolField(String field){
@@ -176,9 +182,15 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     if(subs[selectedSubcategory].template[field]=="string"){
       return createStringField(field);
     }
-    else{
+    if(subs[selectedSubcategory].template[field]=="bool"){
       return createBoolField(field);
     }
+
+    if(subs[selectedSubcategory].template[field]=="*string"){
+      return createStringField(field,mandatory: true);
+    }
+
+    return null;
   }
 
   Widget buildTemplate2(){
@@ -216,12 +228,14 @@ Widget buildTemplate(){
   }
   sortList(l1);
 
-  return ListView.builder(   scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      itemCount: l1.length,
-      itemBuilder: (BuildContext ctxt, int index) {
-        return  createStringField(l1[index]);
-      });
+  return SingleChildScrollView(
+    child: ListView.builder(   scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: l1.length,
+        itemBuilder: (BuildContext ctxt, int index) {
+          return  decideWidget(l1[index]);
+        }),
+  );
 
 }
 
@@ -252,23 +266,32 @@ Widget buildTemplate(){
 
 
   Widget createFieldBoxTile(String field,bool enabled){
+    bool mandatory=subs[selectedSubcategory].template[field].startsWith("*");
+   if(mandatory) {
+     technical[field] = null;
+   }
     Color c;
     //if(enabledFields[field]){
-    if(enabled){
+    if(enabled||mandatory){
       c=Colors.green;
     }
     else{
       c=Colors.grey;
     }
+
+
+
     return Row(children: [
       IconButton(color: c,icon: Icon(Icons.check_circle_outline,), onPressed: (){
-        setState(() {
-          enabledFields[field]=!enabledFields[field];
-          if(!enabledFields[field]){
-            technical.remove(field);
-          }
-          FocusScope.of(context).requestFocus(FocusNode());
-        });
+        if(!mandatory) {
+          setState(() {
+            enabledFields[field] = !enabledFields[field];
+            if (!enabledFields[field]) {
+              technical.remove(field);
+            }
+            FocusScope.of(context).requestFocus(FocusNode());
+          });
+        }
       }),
       Text(field)
     ],);
@@ -287,6 +310,20 @@ Widget buildTemplate(){
     }
   }
 
+  bool validate(){
+    bool res=true;
+    List l=technical.keys.toList();
+    int i=0;
+    while(res&&i<l.length) {
+      if (technical[l[i]] == null) {
+        res = false;
+      }
+      else{
+        i++;
+      }
+    }
+    return res;
+  }
 
 
 }
