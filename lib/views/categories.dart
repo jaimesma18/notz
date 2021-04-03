@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notz/classes/category.dart';
 import 'package:notz/classes/subCategory.dart';
 import 'package:notz/services/db.dart';
+import 'package:notz/widgets/template/boolField.dart';
 import 'package:notz/widgets/template/stringField.dart';
 
 class Categories extends StatefulWidget {
@@ -102,10 +103,13 @@ Map<String,bool> enabledFields=new Map<String,bool>();
             print(enabledFields);
             print(technical);
           }),
-          Row(
+          Row(mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Expanded(flex:10,child:buildTemplate2()), //Column(children: template,)),
+              Expanded(flex:1,child: Container()),
+              Expanded(flex:20,child:buildTemplate2()), //Column(children: template,)),
+              Expanded(flex:2,child: Container()),
               Expanded(flex:6,child: buildFieldBox()),
+              Expanded(flex:1,child: Container()),
             ],
           ),
 
@@ -122,20 +126,36 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     controller.text=technical[field]??"";
 
     callback(){
-
       if(controller.text.isNotEmpty) {
         technical[field] = controller.text;
       }
       else{
         technical.remove(field);
       }
-
-
-
     }
     return StringField(field: field,callback: callback,controller:controller,);
   }
 
+  Widget createBoolField(String field){
+
+    List<bool> selected;
+    selected[0]=false;
+    selected[1]=true;
+
+    callback(){
+      technical[field]=selected[0];
+    }
+    return BoolField(field: field,callback: callback,selected:selected);
+  }
+
+  Widget decideWidget(String field){
+    if(subs[selectedSubcategory].template[field]=="string"){
+      return createStringField(field);
+    }
+    else{
+      return createBoolField(field);
+    }
+  }
 
   Widget buildTemplate2(){
     List l1=[];
@@ -144,15 +164,23 @@ Map<String,bool> enabledFields=new Map<String,bool>();
         l1.add(x);
       }
     }
+    sortList(l1);
 
-    return GridView.count( shrinkWrap: true,
-      // Create a grid with 2 columns. If you change the scrollDirection to
-      // horizontal, this produces 2 rows.
-      crossAxisCount: 3,
-      // Generate 100 widgets that display their index in the List.
-      children: List.generate(l1.length, (int index) {
-        return  createStringField(l1[index]);
-      }));
+    return SingleChildScrollView(scrollDirection: Axis.vertical,
+      child: GridView.count( shrinkWrap: true,
+          childAspectRatio: (3),
+        // Create a grid with 2 columns. If you change the scrollDirection to
+        // horizontal, this produces 2 rows.
+        crossAxisCount: 3,
+        // Generate 100 widgets that display their index in the List.
+        children: List.generate(l1.length, (int index) {
+          return  Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+            //child: decideWidget(l1[index]),
+            child: createStringField(l1[index]),
+          );
+        })),
+    );
       }
 
 Widget buildTemplate(){
@@ -162,6 +190,7 @@ Widget buildTemplate(){
       l1.add(x);
     }
   }
+  sortList(l1);
 
   return ListView.builder(   scrollDirection: Axis.vertical,
       shrinkWrap: true,
@@ -176,15 +205,24 @@ Widget buildTemplate(){
     List l1=[];
     List l2=[];
     l1=enabledFields.keys.toList();
+    sortList(l1);
+    /*l1.sort((a, b) {
+      return a.toLowerCase().compareTo(b.toLowerCase());
+    });*/
     for(var x in l1){
       l2.add(enabledFields[x]);
     }
-   return ListView.builder(   scrollDirection: Axis.vertical,
-       shrinkWrap: true,
-       itemCount: l1.length,
-       itemBuilder: (BuildContext ctxt, int index) {
-         return  createFieldBoxTile(l1[index],l2[index]);
-       });
+   return l1.length>0?SingleChildScrollView(scrollDirection: Axis.vertical,
+     child: Container(padding: EdgeInsets.symmetric(vertical: 10,horizontal: 6),
+       decoration: BoxDecoration(border: Border.all(color:Colors.grey,width: 2), borderRadius: BorderRadius.all(Radius.circular(20))),
+       child: ListView.builder(   scrollDirection: Axis.vertical,
+           shrinkWrap: true,
+           itemCount: l1.length,
+           itemBuilder: (BuildContext ctxt, int index) {
+             return  createFieldBoxTile(l1[index],l2[index]);
+           }),
+     ),
+   ):Container();
 
   }
 
@@ -210,6 +248,19 @@ Widget buildTemplate(){
       }),
       Text(field)
     ],);
+  }
+
+  void sortList(List l,{bool desc}) {
+    if (desc == null || desc == false) {
+      l.sort((a, b) {
+        return a.toLowerCase().compareTo(b.toLowerCase());
+      });
+    }
+    else {
+      l.sort((a, b) {
+        return b.toLowerCase().compareTo(a.toLowerCase());
+      });
+    }
   }
 
 
