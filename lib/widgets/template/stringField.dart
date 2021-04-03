@@ -6,7 +6,7 @@ class StringField extends StatefulWidget {
   TextEditingController controller;
   Function callback;
   Function onRemove;
-  StringField({this.field,this.callback,this.controller});
+  StringField({this.field,this.callback,this.controller,this.onRemove});
   @override
   _StringFieldState createState() => _StringFieldState();
 }
@@ -26,10 +26,11 @@ class _StringFieldState extends State<StringField> {
         child: Container(width: 240,
           child: Stack(
             children: [
-            Container(width: 198,padding: EdgeInsets.fromLTRB(10, 0, 10, 8),
+            Container(width: 198,padding: EdgeInsets.fromLTRB(10, 0, 10, 16),
               child: TextField(controller: widget.controller,
-                maxLines:null,style: TextStyle(fontSize: 14,height: 1),
-                decoration: InputDecoration(
+                maxLines:null,style: TextStyle(fontSize: 14),
+                decoration: InputDecoration(isDense: true,
+                  contentPadding: EdgeInsets.fromLTRB(4, 30, 0, 10),
                  // labelText: widget.field,labelStyle: TextStyle(fontSize: 12),floatingLabelBehavior: FloatingLabelBehavior.never,
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),

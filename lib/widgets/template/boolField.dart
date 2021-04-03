@@ -8,7 +8,7 @@ class BoolField extends StatefulWidget {
   Function callback;
   Function onRemove;
   List<bool> selected;
-  BoolField({this.field,this.callback,this.selected});
+  BoolField({this.field,this.callback,this.selected,this.onRemove});
   @override
   _BoolFieldState createState() => _BoolFieldState();
 }
@@ -40,6 +40,10 @@ bool neverSelected=true;
                 Icon(Icons.check_outlined),
                 Icon(Icons.clear_outlined)
               ],
+                borderColor: Colors.blue,
+                selectedBorderColor: Colors.blue,
+                borderWidth: 2,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
                 //renderBorder: false,
                 isSelected: widget.selected,
                 onPressed: (index){

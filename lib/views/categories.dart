@@ -132,7 +132,16 @@ Map<String,bool> enabledFields=new Map<String,bool>();
         technical.remove(field);
       }
     }
-    return StringField(field: field,callback: callback,controller:controller,);
+
+    onRemove(){
+      if(enabledFields.keys.contains(field)) {
+        setState(() {
+          enabledFields[field] = false;
+        });
+      }
+      technical.remove(field);
+    }
+    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,);
   }
 
   Widget createBoolField(String field){
@@ -149,7 +158,17 @@ Map<String,bool> enabledFields=new Map<String,bool>();
         technical[field] = selected[0];
       }
     }
-    return BoolField(field: field,callback: callback,selected:selected);
+
+    onRemove(){
+      if(enabledFields.keys.contains(field)) {
+        setState(() {
+          enabledFields[field] = false;
+        });
+      }
+      technical.remove(field);
+    }
+
+    return BoolField(field: field,callback: callback,selected:selected,onRemove: onRemove,);
   }
 
   Widget decideWidget(String field){
