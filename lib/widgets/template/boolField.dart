@@ -43,7 +43,7 @@ bool neverSelected=true;
               ],
                 borderColor: Colors.blue,
                 selectedBorderColor: Colors.blue,
-                borderWidth: 2,
+                borderWidth: 1,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 //renderBorder: false,
                 isSelected: widget.selected,
@@ -70,7 +70,7 @@ bool neverSelected=true;
                 ),
             ),
               Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&widget.selected[0]==widget.selected[1]?Colors.red:Colors.blue),)),
-              Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
+              Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
         ]  ),
         ),
       ),

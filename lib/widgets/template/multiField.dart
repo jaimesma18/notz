@@ -1,27 +1,46 @@
 import 'dart:math';
-
+import 'package:multi_select_flutter/multi_select_flutter.dart' as multiSelect;
 import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:universal_html/html.dart';
 
 class MultiField extends StatefulWidget {
   String field;
   Function callback;
   Function onRemove;
-  List<String> values;
+  Map<String,bool> valuesMap;
   bool mandatory;
   bool singleSelection;
-  MultiField({this.field,this.callback,this.values,this.onRemove,this.mandatory,this.singleSelection});
+  MultiField({this.field,this.callback,this.valuesMap,this.onRemove,this.mandatory,this.singleSelection});
   @override
   _MultiFieldState createState() => _MultiFieldState();
 }
 
 class _MultiFieldState extends State<MultiField> {
 //List<bool> selected;
+ScrollController scroller=new ScrollController();
 bool neverSelected=true;
+
   @override
   void initState() {
 
     super.initState();
+
+  }
+
+  bool logicalOr(List<bool> l){
+    bool res=false;
+    int i=0;
+
+    while(!res&&i<l.length){
+      if(l[i]){
+        res=true;
+      }
+      else{
+        i++;
+      }
+    }
+    return res;
 
   }
 
@@ -34,43 +53,47 @@ bool neverSelected=true;
           child: Stack(
             children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(80,20,0,0),
+              padding: const EdgeInsets.fromLTRB(10,20,40,0),
               child: ConstrainedBox(constraints: BoxConstraints(maxHeight: 36),
                // Container(width: 198,padding: EdgeInsets.fromLTRB(60, 20, 10, 0),
-              child: ToggleButtons(children: [
-                Icon(Icons.check_outlined),
-                Icon(Icons.clear_outlined)
-              ],
-                borderColor: Colors.blue,
-                selectedBorderColor: Colors.blue,
-                borderWidth: 2,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                //renderBorder: false,
-                isSelected: widget.selected,
-                onPressed: (index){
-                int index2=pow(index-1,2);
+              child: (multiSelect.MultiSelectChipDisplay(
+                textStyle: TextStyle(color: Colors.blue[900]),
 
-                setState(() {
-                  if(neverSelected){
-                    widget.selected[index] = !widget.selected[index];
-                    neverSelected=false;
+                //decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
+                //chipColor: Colors.green,
+                colorator: (index){
+                  if(widget.valuesMap[index]){
+                    return Colors.lightBlue[600];
                   }
-                  else {
-                    widget.selected[index] = true;//!widget.selected[index];
-                    widget.selected[index2] = false;//!widget.selected[index2];
+                  else{
+                    return Colors.lightBlue[50];
                   }
-                });
+                },
+                scroll: true,
+                items: widget.valuesMap.keys.toList().map((e) => MultiSelectItem(e, e)).toList(),
+                onTap: (index){
+                if(widget.singleSelection){
+                  for(var x in widget.valuesMap.keys){
+                    widget.valuesMap[x]=false;
+                  }
+                  setState(() {
+                    widget.valuesMap[index]=true;
+                  });
+
+                }
+                else{
+                  setState(() {
+                    widget.valuesMap[index]=! widget.valuesMap[index];
+                  });
+
+                }
                 widget.callback();
                 },
-                color: Colors.grey,
-                selectedColor:  widget.selected[0]?Colors.green:Colors.red,
-                //fillColor: Colors.transparent,//Colors.lightBlue[100],
-
-              ),
+              )),
                 ),
             ),
-              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&widget.selected[0]==widget.selected[1]?Colors.red:Colors.blue),)),
-              Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
+              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:Colors.blue),)),
+              Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
              // Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: Colors.blue),)),
              // Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: Colors.blue),onPressed: widget.onRemove,))
         ]  ),

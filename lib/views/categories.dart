@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notz/classes/category.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/widgets/template/boolField.dart';
+import 'package:notz/widgets/template/multiField.dart';
 import 'package:notz/widgets/template/stringField.dart';
 
 class Categories extends StatefulWidget {
@@ -177,15 +178,94 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     return BoolField(field: field,callback: callback,selected:selected,onRemove: onRemove,mandatory: mandatory,);
   }
 
+  Widget createMultiField(String field,String values,bool singleChoice,{bool mandatory}){
+
+    Map<String,bool> multiValues=new Map<String,bool>();
+    values=values.substring(0,values.length-1);
+    List temp=[];
+    if(singleChoice){
+     temp=values.split('(')[1].split(";");
+      }
+    else{
+      temp=values.split('[')[1].split(";");
+    }
+    for(var x in temp) {
+      multiValues[x] = false;
+    }
+
+
+    callback(){
+      List l=multiValues.keys.toList();
+      if(singleChoice){
+        bool found=false;
+       int i=0;
+       while(!found&&i<l.length){
+         if(multiValues[l[i]]){
+           found=true;
+           technical[field]=l[i];
+         }
+         else{
+           i++;
+         }
+       }
+       if(!found){
+         technical[field]=null;
+       }
+      }
+      else{
+        List temp=[];
+        for(var x in l){
+          if(multiValues[x]){
+           temp.add(x);
+          }
+          else{
+            temp.remove(x);
+          }
+
+        }
+        if(temp.isEmpty){
+          technical[field]=null;
+        }
+        else{
+          technical[field]=temp.join(", ");
+        }
+      }
+    /*  if(selected[0]==selected[1]){
+        technical.remove(field);
+      }
+      else {
+        technical[field] = selected[0];
+      }*/
+    }
+
+    onRemove(){
+      if(enabledFields.keys.contains(field)) {
+        setState(() {
+          enabledFields[field] = false;
+        });
+      }
+      technical.remove(field);
+    }
+
+    return MultiField(field: field,callback: callback,valuesMap:multiValues,onRemove: onRemove,mandatory: mandatory,singleSelection: singleChoice,);
+  }
+
   Widget decideWidget(String field){
-    bool mandatory=subs[selectedSubcategory].template[field].startsWith("*");
+    String type=subs[selectedSubcategory].template[field];
+    bool mandatory=type.startsWith("*");
 
 
-    if(subs[selectedSubcategory].template[field].endsWith("string")){
+    if(type.endsWith("string")){
       return createStringField(field,mandatory: mandatory);
     }
-    if(subs[selectedSubcategory].template[field].endsWith("bool")){
+    if(type.endsWith("bool")){
       return createBoolField(field,mandatory: mandatory);
+    }
+    if(type.endsWith(")")){
+      return createMultiField(field,type,true,mandatory: mandatory);
+    }
+    if(type.endsWith("]")){
+      return createMultiField(field,type,false,mandatory: mandatory);
     }
 
 
