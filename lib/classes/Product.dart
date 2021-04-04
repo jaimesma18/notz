@@ -1,5 +1,6 @@
 class Product{
 
+  String category;
   String model;
   String brand;
   String title;
@@ -14,7 +15,7 @@ class Product{
   Map photosName;
 
 
-  Product({this.title,this.model,this.brand,this.bullets,this.technicals,this.upc,this.customs,this.dimensions,this.photos,this.keywords,this.manufacturer,this.photosName});
+  Product({this.category,this.title,this.model,this.brand,this.bullets,this.technicals,this.upc,this.customs,this.dimensions,this.photos,this.keywords,this.manufacturer,this.photosName});
 
 
 

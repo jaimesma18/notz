@@ -47,6 +47,7 @@ Product productFromDoc(Map<String,dynamic> m){
   }
 
   p= new Product(
+      category: m['category'],
       title: m['titulo'],
       model:m['modelo'],
       brand: m['marca'],
@@ -65,6 +66,7 @@ Product productFromDoc(Map<String,dynamic> m){
 
   return p;
 }
+
 
 Future<Product> getProducto(String model)async{
   Product p=null;
@@ -367,10 +369,7 @@ Future<Map<String,Category>> getCategories({String parent})async{
          .get()
          .then((QuerySnapshot snapshot) {
        for (var x in snapshot.docs) {
-         Category c = new Category(name: x.data()['name'],
-             id: x.id,
-             template: x.data()['template'],
-             parent: x.data()['parent']);
+         Category c = categoryFromDoc(x.data(), x.id);
          m[c.name] = c;
        }
      });
@@ -382,10 +381,7 @@ Future<Map<String,Category>> getCategories({String parent})async{
          .get()
          .then((QuerySnapshot snapshot) {
        for (var x in snapshot.docs) {
-         Category c = new Category(name: x.data()['name'],
-             id: x.id,
-             template: x.data()['template'],
-             parent: x.data()['parent']);
+         Category c = categoryFromDoc(x.data(), x.id);
          m[c.name] = c;
        }
      });
@@ -394,5 +390,31 @@ Future<Map<String,Category>> getCategories({String parent})async{
   return m;
 }
 
+Future<Category> getCategory(String id)async{
+  Category c =null;
+
+  await FirebaseFirestore.instance
+        .collection('categories')
+      .doc(id)
+      .get()
+      .then((DocumentSnapshot doc) {
+
+      if (doc.exists) {
+   c=categoryFromDoc(doc.data(), doc.id);
+      }});
+
+
+  return c;
+}
+
+Category categoryFromDoc(Map<String,dynamic> m,String id){
+  Category c = new Category(
+      name: m['name'],
+      id: id,
+      template: m['template'],
+      parent: m['parent']);
+
+  return c;
+}
 
 }

@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:notz/classes/Product.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/views/users.dart';
+import 'package:notz/widgets/technical.dart';
 
 class ProductView extends StatefulWidget {
   @override
@@ -311,6 +312,7 @@ Future<Product> downloadProduct(String model)async{
     widgets['Características']=Bullets(bullets:product.bullets,edit: permissions["Características"]>1,model: product.model,mobile:mobile);
     widgets['Medidas']=Dimensions(dimensions:product.dimensions,edit: permissions["Medidas"]>1?true:false);
     widgets['Código de Barras']=BCode(upc:product.upc,edit: permissions["Código de Barras"]>1?true:false,mobile: mobile,model:product.model,);
+    widgets['Especificaciones Técnicas']=Technical(mobile: mobile,model: product.model,edit: permissions['Especificaciones Técnicas']>1,data: product.technicals,category: product.category,);
     widgets['Usuarios']=Users();
 
     List l0=permissions.keys.toList();

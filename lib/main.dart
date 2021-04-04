@@ -9,6 +9,7 @@ import 'package:notz/views/passwordReset.dart';
 import 'package:notz/views/productViewMobile.dart';
 import 'package:notz/views/uploadProduct.dart';
 import 'package:notz/views/users.dart';
+import 'package:notz/widgets/technical.dart';
 import 'wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           '/imageEditor':(context)=>ImageEditor(),
           '/tester':(context)=>Tester(),
           '/categories':(context)=>Categories(),
+          '/technical':(context)=>Technical(),
 
 
         },
