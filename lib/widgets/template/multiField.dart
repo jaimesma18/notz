@@ -3,24 +3,24 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:universal_html/html.dart';
 
-class BoolField extends StatefulWidget {
+class MultiField extends StatefulWidget {
   String field;
   Function callback;
   Function onRemove;
-  List<bool> selected;
+  List<String> values;
   bool mandatory;
-  BoolField({this.field,this.callback,this.selected,this.onRemove,this.mandatory});
+  bool singleSelection;
+  MultiField({this.field,this.callback,this.values,this.onRemove,this.mandatory,this.singleSelection});
   @override
-  _BoolFieldState createState() => _BoolFieldState();
+  _MultiFieldState createState() => _MultiFieldState();
 }
 
-class _BoolFieldState extends State<BoolField> {
+class _MultiFieldState extends State<MultiField> {
 //List<bool> selected;
 bool neverSelected=true;
   @override
   void initState() {
-  //  selected[0]=false;
-  //  selected[1]=true;
+
     super.initState();
 
   }
@@ -71,6 +71,8 @@ bool neverSelected=true;
             ),
               Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&widget.selected[0]==widget.selected[1]?Colors.red:Colors.blue),)),
               Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
+             // Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: Colors.blue),)),
+             // Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: Colors.blue),onPressed: widget.onRemove,))
         ]  ),
         ),
       ),

@@ -150,7 +150,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,mandatory: mandatory??false,);
   }
 
-  Widget createBoolField(String field){
+  Widget createBoolField(String field,{bool mandatory}){
 
     List<bool> selected=[];
     selected.add(false);
@@ -174,21 +174,21 @@ Map<String,bool> enabledFields=new Map<String,bool>();
       technical.remove(field);
     }
 
-    return BoolField(field: field,callback: callback,selected:selected,onRemove: onRemove,);
+    return BoolField(field: field,callback: callback,selected:selected,onRemove: onRemove,mandatory: mandatory,);
   }
 
   Widget decideWidget(String field){
+    bool mandatory=subs[selectedSubcategory].template[field].startsWith("*");
 
-    if(subs[selectedSubcategory].template[field]=="string"){
-      return createStringField(field);
+
+    if(subs[selectedSubcategory].template[field].endsWith("string")){
+      return createStringField(field,mandatory: mandatory);
     }
-    if(subs[selectedSubcategory].template[field]=="bool"){
-      return createBoolField(field);
+    if(subs[selectedSubcategory].template[field].endsWith("bool")){
+      return createBoolField(field,mandatory: mandatory);
     }
 
-    if(subs[selectedSubcategory].template[field]=="*string"){
-      return createStringField(field,mandatory: true);
-    }
+
 
     return null;
   }
