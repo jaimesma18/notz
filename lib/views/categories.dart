@@ -109,7 +109,10 @@ Map<String,bool> enabledFields=new Map<String,bool>();
               Expanded(flex:1,child: Container()),
               Expanded(flex:20,child:buildTemplate2()), //Column(children: template,)),
               Expanded(flex:2,child: Container()),
-              Expanded(flex:6,child: buildFieldBox()),
+              Expanded(flex:6,child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 10, 4),
+                child: buildFieldBox(),
+              )),
               Expanded(flex:1,child: Container()),
             ],
           ),
@@ -121,13 +124,47 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     );
   }
 
-  Widget createStringField(String field,{bool mandatory}){
+  Widget createStringField(String field,{bool mandatory,String type}){
+
+    bool validate(String s,String type) {
+      if (s == null) {
+        return false;
+      }
+      if(type=='string'){
+        return s!="";
+      }
+      if(type=='double') {
+        return double.tryParse(s) != null;
+      }
+      if(type=='int'){
+        return int.tryParse(s) != null;
+      }
+      if(type=='natural'){
+        int x=int.tryParse(s);
+        if(x!=null&&x>=0){
+          return true;
+        }
+      }
+      if(type=='positive'){
+        int x=int.tryParse(s);
+        if(x!=null&&x>0){
+          return true;
+        }
+      }
+      if(type=='negative'){
+        int x=int.tryParse(s);
+        if(x!=null&&x<0){
+          return true;
+        }
+      }
+      return false;
+    }
 
     TextEditingController controller=new TextEditingController();
     controller.text=technical[field]??"";
 
     callback(){
-      if(controller.text.isNotEmpty) {
+      if(validate(controller.text,type)) {
         technical[field] = controller.text;
       }
       else{
@@ -148,7 +185,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
       }
       technical.remove(field);
     }
-    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,mandatory: mandatory??false,);
+    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,mandatory: mandatory??false,type: type,validate: validate,);
   }
 
   Widget createBoolField(String field,{bool mandatory}){
@@ -230,12 +267,6 @@ Map<String,bool> enabledFields=new Map<String,bool>();
           technical[field]=temp.join(", ");
         }
       }
-    /*  if(selected[0]==selected[1]){
-        technical.remove(field);
-      }
-      else {
-        technical[field] = selected[0];
-      }*/
     }
 
     onRemove(){
@@ -256,7 +287,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
 
 
     if(type.endsWith("string")){
-      return createStringField(field,mandatory: mandatory);
+      return createStringField(field,mandatory: mandatory,type: "string");
     }
     if(type.endsWith("bool")){
       return createBoolField(field,mandatory: mandatory);
@@ -266,6 +297,21 @@ Map<String,bool> enabledFields=new Map<String,bool>();
     }
     if(type.endsWith("]")){
       return createMultiField(field,type,false,mandatory: mandatory);
+    }
+    if(type.endsWith("int")){
+      return createStringField(field,mandatory: mandatory,type: "int");
+    }
+    if(type.endsWith("double")){
+      return createStringField(field,mandatory: mandatory,type:"double");
+    }
+    if(type.endsWith("natural")){
+      return createStringField(field,mandatory: mandatory,type:"natural");
+    }
+    if(type.endsWith("positive")){
+      return createStringField(field,mandatory: mandatory,type:"positive");
+    }
+    if(type.endsWith("negative")){
+      return createStringField(field,mandatory: mandatory,type:"negative");
     }
 
 

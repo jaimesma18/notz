@@ -7,7 +7,9 @@ class StringField extends StatefulWidget {
   Function callback;
   Function onRemove;
   bool mandatory;
-  StringField({this.field,this.callback,this.controller,this.onRemove,this.mandatory});
+  String type;
+  Function validate;
+  StringField({this.field,this.callback,this.controller,this.onRemove,this.mandatory,this.type,this.validate});
   @override
   _StringFieldState createState() => _StringFieldState();
 }
@@ -18,7 +20,9 @@ class _StringFieldState extends State<StringField> {
   void initState() {
     super.initState();
 
+
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(width: 200,height: 60,
@@ -40,13 +44,14 @@ class _StringFieldState extends State<StringField> {
                     borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),onChanged: (val){
+
                   widget.callback();
                   setState(() {
 
                   });
               },),
             ),
-              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(widget.controller.text==null||widget.controller.text=="")?Colors.red:Colors.blue),)),
+              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!widget.validate(widget.controller.text, widget.type))?Colors.red:Colors.blue),)),
               Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
           ],
           ),
