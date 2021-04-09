@@ -27,6 +27,7 @@ Map<String,bool> enabledFields=new Map<String,bool>();
 Category category;
 
 
+
   @override
   void initState() {
     super.initState();
@@ -241,13 +242,18 @@ Category category;
   }
 
   Widget decideWidget(String field){
-
+    String type="";
 
     if(field=="+"){
-        return NewField();
+      Map values=new Map();
+
+       void callback(){
+
+      }
+        return NewField(onAccept: callback,values: values,);
     }
     else {
-      String type = category.template[field];
+      type = category.template[field];
       bool mandatory = type.startsWith("*");
 
 

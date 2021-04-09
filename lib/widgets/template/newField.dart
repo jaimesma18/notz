@@ -3,13 +3,13 @@ import 'package:universal_html/html.dart';
 
 
 class NewField extends StatefulWidget {
-  TextEditingController fieldController;
-  String type;
-  bool mandatory;
+
+  //bool mandatory;
   Function onAccept;
-  Function onRemove;
-  Function validate;
-  NewField({this.onAccept,this.fieldController,this.onRemove,this.mandatory,this.type,this.validate});
+  Map values;
+  //Function onRemove;
+  //Function validate;
+  NewField({this.onAccept,this.values});
   @override
   _NewFieldState createState() => _NewFieldState();
 }
@@ -17,12 +17,13 @@ class NewField extends StatefulWidget {
 class _NewFieldState extends State<NewField> {
   TextEditingController fieldController=new TextEditingController();
   int phase=0;
-  String type="";
+  //String type="";
   List<bool>selected=[];
+  int currentSelected=-1;
 
   @override
   void initState() {
-    selected.add(true);
+    selected.add(false);
     selected.add(false);
     selected.add(false);
     selected.add(false);
@@ -33,15 +34,19 @@ class _NewFieldState extends State<NewField> {
 
   @override
   Widget build(BuildContext context) {
+    return wrapCard();
+   // );
+  }
+
+  Widget wrapCard(){
     return Container(width: 200,height: 60,
       child: Card(elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),side:BorderSide(color: Colors.blue,width: 2) ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),side:BorderSide(color: Colors.blue,width: 2) ),
         child: Container(width: 240,
           child:  createCard(),
         ),
       ),
     );
-   // );
   }
 
   Widget createCard(){
@@ -88,15 +93,15 @@ class _NewFieldState extends State<NewField> {
            ),
            Positioned(left:10,top: 4,child: Text("Nombre del campo",style: TextStyle(fontSize: 12,color: Colors.blue),)),
 
-           Positioned(right:40,bottom: 20,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.check_circle_outline,color: fieldController.text.isNotEmpty?Colors.green:Colors.grey),onPressed: fieldController.text.isNotEmpty?(){
-             fieldController=new TextEditingController();
+           Positioned(right:40,bottom: 17,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.check_circle_outline,color: fieldController.text.isNotEmpty?Colors.green:Colors.grey),onPressed: fieldController.text.isNotEmpty?(){
              setState(() {
                phase=2;
              });
            }:null,)),
 
-           Positioned(right:0,bottom: 20,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.cancel_outlined,color: Colors.red),onPressed: (){
+           Positioned(right:0,bottom: 17,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.cancel_outlined,color: Colors.red),onPressed: (){
              fieldController=new TextEditingController();
+             currentSelected=-1;
              setState(() {
                phase=0;
              });
@@ -130,10 +135,27 @@ class _NewFieldState extends State<NewField> {
                  isSelected: selected,
                  onPressed: (index){
 
+                 if(index==0){
+                   //widget.type='string';
+                   widget.values['type']='string';
+                 }
+                 if(index==1){
+                   //widget.type="positive";
+                   widget.values['type']='positive';
+                 }
+                 if(index==2){
+                   //widget.type="double";
+                   widget.values['type']='double';
+                 }
+                 if(index==3){
+                   //widget.type='bool';
+                   widget.values['type']='bool';
+                 }
 
                    setState(() {
-                    for(var x in selected){
-                      x=false;
+                     currentSelected=index;
+                    for(int i=0;i<selected.length;i++){
+                      selected[i]=false;
                     }
                     selected[index]=true;
                    });
@@ -148,15 +170,18 @@ class _NewFieldState extends State<NewField> {
            ),
            Positioned(left:10,top: 4,child: Text("Tipo del campo",style: TextStyle(fontSize: 12,color: Colors.blue),)),
 
-           Positioned(right:40,bottom: 20,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.check_circle_outline,color: fieldController.text.isNotEmpty?Colors.green:Colors.grey),onPressed: fieldController.text.isNotEmpty?(){
-             fieldController=new TextEditingController();
+           Positioned(right:40,bottom: 17,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.check_circle_outline,color: currentSelected>=0?Colors.green:Colors.grey),onPressed: currentSelected>=0?(){
              setState(() {
-               phase=3;
+               phase=0;
+               widget.values['name']=  fieldController.text;
              });
+             widget.onAccept();
            }:null,)),
 
-           Positioned(right:0,bottom: 20,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.cancel_outlined,color: Colors.red),onPressed: (){
+           Positioned(right:0,bottom: 17,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.cancel_outlined,color: Colors.red),onPressed: (){
              fieldController=new TextEditingController();
+             widget.values=new Map();
+             //widget.type="";
              setState(() {
                phase=0;
              });
