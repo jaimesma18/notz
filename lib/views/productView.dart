@@ -131,13 +131,18 @@ Future<Product> downloadProduct(String model)async{
                   padding: const EdgeInsets.fromLTRB(34, 8, 0, 14),
                   child: permissionsBar(),
                 ),
+               //SizedBox(height: 10,),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(76,10,0,0),
+                  child: Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),),
+                ),
                 SizedBox(height: 10,),
                 Row(crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(flex:2,child: Container()),
-                    Expanded(flex:14,child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(flex:20,child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                      Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),),
+                    //  Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),),
                       SizedBox(height: 10,),
                       RichText(
                         text: new TextSpan(

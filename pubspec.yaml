@@ -41,6 +41,8 @@ dependencies:
   image_gallery_saver: ^1.6.8
   universal_html: ^1.2.4
   multi_select_flutter: ^3.1.8
+  flutter_spinkit: ^4.1.2
+
 
 
 

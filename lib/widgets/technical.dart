@@ -3,7 +3,10 @@ import 'package:notz/classes/category.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/widgets/template/boolField.dart';
 import 'package:notz/widgets/template/multiField.dart';
+import 'package:notz/widgets/template/newField.dart';
 import 'package:notz/widgets/template/stringField.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
 
 class Technical extends StatefulWidget {
   Map data;
@@ -53,7 +56,7 @@ Category category;
   @override
   Widget build(BuildContext context) {
     return
-      Column(children:[
+      loaded?Column(children:[
         buildFieldBox(),
           buildTemplate2(),
 
@@ -76,7 +79,7 @@ Category category;
             print(technical);
           }),
 
-        ]);
+        ]):Container(height:400,child: Center(child: SpinKitCircle(color: Colors.blue,)));
 
   }
 
@@ -238,36 +241,43 @@ Category category;
   }
 
   Widget decideWidget(String field){
-    String type=category.template[field];
-    bool mandatory=type.startsWith("*");
 
 
-    if(type.endsWith("string")){
-      return createStringField(field,mandatory: mandatory,type: "string");
+    if(field=="+"){
+        return NewField();
     }
-    if(type.endsWith("bool")){
-      return createBoolField(field,mandatory: mandatory);
-    }
-    if(type.endsWith(")")){
-      return createMultiField(field,type,true,mandatory: mandatory);
-    }
-    if(type.endsWith("]")){
-      return createMultiField(field,type,false,mandatory: mandatory);
-    }
-    if(type.endsWith("int")){
-      return createStringField(field,mandatory: mandatory,type: "int");
-    }
-    if(type.endsWith("double")){
-      return createStringField(field,mandatory: mandatory,type:"double");
-    }
-    if(type.endsWith("natural")){
-      return createStringField(field,mandatory: mandatory,type:"natural");
-    }
-    if(type.endsWith("positive")){
-      return createStringField(field,mandatory: mandatory,type:"positive");
-    }
-    if(type.endsWith("negative")){
-      return createStringField(field,mandatory: mandatory,type:"negative");
+    else {
+      String type = category.template[field];
+      bool mandatory = type.startsWith("*");
+
+
+      if (type.endsWith("string")) {
+        return createStringField(field, mandatory: mandatory, type: "string");
+      }
+      if (type.endsWith("bool")) {
+        return createBoolField(field, mandatory: mandatory);
+      }
+      if (type.endsWith(")")) {
+        return createMultiField(field, type, true, mandatory: mandatory);
+      }
+      if (type.endsWith("]")) {
+        return createMultiField(field, type, false, mandatory: mandatory);
+      }
+      if (type.endsWith("int")) {
+        return createStringField(field, mandatory: mandatory, type: "int");
+      }
+      if (type.endsWith("double")) {
+        return createStringField(field, mandatory: mandatory, type: "double");
+      }
+      if (type.endsWith("natural")) {
+        return createStringField(field, mandatory: mandatory, type: "natural");
+      }
+      if (type.endsWith("positive")) {
+        return createStringField(field, mandatory: mandatory, type: "positive");
+      }
+      if (type.endsWith("negative")) {
+        return createStringField(field, mandatory: mandatory, type: "negative");
+      }
     }
 
 
@@ -283,6 +293,7 @@ Category category;
       }
     }
     sortList(l1);
+    l1.add("+");
 
     return SingleChildScrollView(scrollDirection: Axis.vertical,
       child: GridView.count( shrinkWrap: true,
@@ -321,14 +332,35 @@ Widget buildTemplate(){
 
 }
 
-  Widget buildFieldBox(){
+Widget buildFieldBox(){
+  List l1=[];
+  List l2=[];
+  l1=enabledFields.keys.toList();
+  sortList(l1);
+  for(var x in l1){
+    l2.add(enabledFields[x]);
+  }
+  return l1.length>0?SingleChildScrollView(scrollDirection: Axis.vertical,
+    child: GridView.count( shrinkWrap: true,
+        childAspectRatio: (5),
+        // Create a grid with 2 columns. If you change the scrollDirection to
+        // horizontal, this produces 2 rows.
+        crossAxisCount: 3,
+        // Generate 100 widgets that display their index in the List.
+        children: List.generate(l1.length, (int index) {
+          return  Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 15),
+            child:createFieldBoxTile(l1[index],l2[index]),
+            //child: createStringField(l1[index]),
+          );
+        })),
+  ):Container();
+}
+ /* Widget buildFieldBox(){
     List l1=[];
     List l2=[];
     l1=enabledFields.keys.toList();
     sortList(l1);
-    /*l1.sort((a, b) {
-      return a.toLowerCase().compareTo(b.toLowerCase());
-    });*/
     for(var x in l1){
       l2.add(enabledFields[x]);
     }
@@ -343,8 +375,7 @@ Widget buildTemplate(){
            }),
      ),
    ):Container();
-
-  }
+  }*/
 
 
   Widget createFieldBoxTile(String field,bool enabled){
@@ -363,7 +394,8 @@ Widget buildTemplate(){
 
 
 
-    return Row(children: [
+    return Row(crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
       IconButton(color: c,icon: Icon(Icons.check_circle_outline,), onPressed: (){
         if(!mandatory) {
           setState(() {
