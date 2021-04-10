@@ -173,7 +173,7 @@ class _NewFieldState extends State<NewField> {
            Positioned(right:40,bottom: 17,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:28,icon: Icon(Icons.check_circle_outline,color: currentSelected>=0?Colors.green:Colors.grey),onPressed: currentSelected>=0?(){
              setState(() {
                phase=0;
-               widget.values['name']=  fieldController.text;
+               widget.values['field']=  fieldController.text;
              });
              widget.onAccept();
            }:null,)),

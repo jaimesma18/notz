@@ -25,6 +25,7 @@ class _StringFieldState extends State<StringField> {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(width: 200,height: 60,
       child: Card(elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),side:BorderSide(color: Colors.blue,width: 2) ),
@@ -51,7 +52,7 @@ class _StringFieldState extends State<StringField> {
                   });
               },),
             ),
-              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!widget.validate(widget.controller.text, widget.type))?Colors.red:Colors.blue),)),
+              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!widget.validate(widget.controller.text, widget.type))?Colors.red:widget.controller.text.isNotEmpty&&!widget.validate(widget.controller.text, widget.type)?Colors.amber[600]:Colors.blue),)),
               Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
           ],
           ),

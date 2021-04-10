@@ -16,9 +16,12 @@ class BoolField extends StatefulWidget {
 
 class _BoolFieldState extends State<BoolField> {
 //List<bool> selected;
-bool neverSelected=true;
+bool neverSelected=false;
   @override
   void initState() {
+   if(widget.selected[0]==widget.selected[1]){
+     neverSelected=true;
+   }
   //  selected[0]=false;
   //  selected[1]=true;
     super.initState();

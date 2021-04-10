@@ -58,7 +58,7 @@ Product productFromDoc(Map<String,dynamic> m){
       dimensions: m['medidas'],
       customs: m['aduana'],
       bullets: m['bullets'],
-      technicals: m['tecnicas'],
+      technicals: m['tecnicas']??new Map(),
     manufacturer: m['fabricante'],
     keywords: m['keywords'],
 

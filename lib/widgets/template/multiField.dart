@@ -28,10 +28,10 @@ String displaySingleSelection="";
     if(widget.singleSelection!=null){
 
       if(widget.singleSelection){
-        displaySingleSelection="(= 1)";
+        displaySingleSelection="(1)";
       }
       else{
-        displaySingleSelection="(>= 1)";
+        displaySingleSelection="(1+)";
       }
     }
 
