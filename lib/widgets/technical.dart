@@ -49,7 +49,6 @@ Map data=new Map();
 
     widget.data!=null?
     data = json.decode(json.encode(widget.data)):data=new Map();
-    print(data);
 
   }
 
@@ -64,7 +63,6 @@ Map data=new Map();
 
     //widget.data!=null?
     //technical = json.decode(json.encode(widget.data)):technical=new Map();
-    //print(technical);
 
     for(var x in category.template.keys){
       templateFields[x]=true;
@@ -84,7 +82,6 @@ Map data=new Map();
 
     }
 
-    //print(technical);
 
 
     setState(() {
@@ -113,7 +110,7 @@ Map data=new Map();
       children: [
     FlatButton.icon(icon:Icon(Icons.edit,color:Colors.blue),label: Text("Editar",style: TextStyle(color: Colors.blue,),),onPressed: (){
       if(widget.category!=null) {
-        initEdit().whenComplete(() => print("complete"));
+        initEdit().whenComplete(() => print(""));
         hasCategory=true;
       }
       setState(() {
@@ -658,7 +655,6 @@ Widget buildFieldBox(){
     for(var x in technical.keys.toList()){
       res=res&&checkType(technical[x]['value'], technical[x]['type']);
     }
-    print(res);
     return res;
   }
 
