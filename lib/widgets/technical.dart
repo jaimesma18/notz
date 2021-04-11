@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:notz/classes/category.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/widgets/template/boolField.dart';
 import 'package:notz/widgets/template/multiField.dart';
 import 'package:notz/widgets/template/newField.dart';
+import 'package:notz/widgets/template/saveCancel.dart';
 import 'package:notz/widgets/template/stringField.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:notz/widgets/template/viewWidget.dart';
 
 
 class Technical extends StatefulWidget {
@@ -23,11 +26,15 @@ class Technical extends StatefulWidget {
 }
 
 class _TechnicalState extends State<Technical> {
-bool loaded=false;
+  bool loaded=false;
+bool editLoaded=false;
 Map technical=new Map();//Este es el que se va a usar para subir al producto
 Map<String,bool> templateFields=new Map<String,bool>();
 Map uploaded=new Map();
 Category category;
+bool editing=false;
+bool hasCategory=false;
+Map data=new Map();
 
 
 
@@ -35,14 +42,23 @@ Category category;
   void initState() {
     super.initState();
 
-    init().whenComplete(() => print("complete"));
+   /* if(widget.category!=null) {
+      initEdit().whenComplete(() => print("complete"));
+      hasCategory=true;
+    }*/
 
+    widget.data!=null?
+    data = json.decode(json.encode(widget.data)):data=new Map();
+    print(data);
 
   }
 
-  Future init()async{
 
-    category= await DatabaseService().getCategory(widget.category);
+  Future initEdit()async{
+
+    if(!editLoaded) {
+      category = await DatabaseService().getCategory(widget.category);
+    }
     templateFields.clear();
     technical.clear();
 
@@ -59,62 +75,108 @@ Category category;
       //template.add(createStringField(x));
     }
 
-    for(var x in widget.data.keys.toList()){
+    for(var x in data.keys.toList()){
       if(!technical.keys.contains(x)) {
         technical[x]=new Map();
       }
-        technical[x]['value']=widget.data[x]['value'];
-        technical[x]['type']=widget.data[x]['type'];
+        technical[x]['value']=data[x]['value'];
+        technical[x]['type']=data[x]['type'];
 
     }
 
-    print(technical);
+    //print(technical);
 
 
     setState(() {
-      loaded = true;
+      editLoaded = true;
     });
 
   }
   @override
   Widget build(BuildContext context) {
 
-    return
-      loaded?Column(children:[
-        buildFieldBox(),
-          buildTemplate2(),
+    return Column(
+      children: [
+        !editing?viewWidget():
+        editingWidget()
 
-         /* Row(mainAxisAlignment: MainAxisAlignment.start,
+      ],
+    );
+
+
+  }
+
+
+
+  Widget viewWidget(){
+    return Column(crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+    FlatButton.icon(icon:Icon(Icons.edit,color:Colors.blue),label: Text("Editar",style: TextStyle(color: Colors.blue,),),onPressed: (){
+      if(widget.category!=null) {
+        initEdit().whenComplete(() => print("complete"));
+        hasCategory=true;
+      }
+      setState(() {
+        editing=true;
+      });
+    }
+    ),
+        buildViewBox(),
+
+
+
+      ],
+    );
+  }
+
+  Widget editingWidget(){
+
+    if(hasCategory) {
+      if(editLoaded){
+      return Column(children: [
+
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 15, 0, 15),
+          child: Row(mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Expanded(flex:1,child: Container()),
-              Expanded(flex:20,child:buildTemplate2()), //Column(children: template,)),
-              Expanded(flex:2,child: Container()),
-              Expanded(flex:6,child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 10, 4),
-                child: buildFieldBox(),
-              )),
-              Expanded(flex:1,child: Container()),
-            ],
-          ),*/
-
-          RaisedButton(child:Text("Click"),onPressed:()async{
-            if(validate()){
-              List l=technical.keys.toList();
-              for(var x in l){
-                if(technical[x]['value']==null){
-                  technical.remove(x);
+              SaveCancel(save: true, callback: () async{
+                if (validate()) {
+                  List l = technical.keys.toList();
+                  for (var x in l) {
+                    if (technical[x]['value'] == null) {
+                      technical.remove(x);
+                    }
+                  }
+                  await DatabaseService().updateProduct(
+                      widget.model, technicals: technical);
+                  technical!=null?
+                  data = json.decode(json.encode(technical)):data=new Map();
+                  setState(() {
+                    editing = false;
+                  });
                 }
-              }
-             await DatabaseService().updateProduct(widget.model,technicals: technical);
 
-            }
-            //print("Valid?: ${validate()}");
-            //print(templateFields);
-            //print(technical);
-          }),
+              },),
+              SizedBox(width: 20,),
+              SaveCancel(save: false, callback: () {
+                setState(() {
+                  editing = false;
+                });
+              },),
+            ],),
+        ),
 
-        ]):Container(height:400,child: Center(child: SpinKitCircle(color: Colors.blue,)));
+        buildFieldBox(),
+        buildTemplate2(),
 
+      ]);}
+      else{
+        return Container(height:400,child: Center(child: SpinKitCircle(color: Colors.blue,)));
+      }
+    }
+    else{
+      return Text("No hay categoria, reportar");
+    }
   }
 
   Widget createStringField(String field,{bool mandatory,String type}){
@@ -249,7 +311,10 @@ Category category;
           templateFields[field] = false;
         });
       }
-      technical.remove(field);
+      setState(() {
+        technical.remove(field);
+      });
+
     }
 
     return BoolField(field: field,callback: callback,selected:selected,onRemove: onRemove,mandatory: mandatory,);
@@ -328,7 +393,9 @@ Category category;
           templateFields[field] = false;
         });
       }
-      technical.remove(field);
+      setState(() {
+        technical.remove(field);
+      });
     }
 
     return MultiField(field: field,callback: callback,valuesMap:multiValues,onRemove: onRemove,mandatory: mandatory,singleSelection: singleChoice,);
@@ -427,6 +494,29 @@ Category category;
     );
       }
 
+  Widget createSaveCancelButtons(){
+
+    List<bool> l1=[];
+    l1.add(true);
+    l1.add(false);
+
+    return SingleChildScrollView(scrollDirection: Axis.vertical,
+      child: GridView.count( shrinkWrap: true,
+          childAspectRatio: (3),
+          // Create a grid with 2 columns. If you change the scrollDirection to
+          // horizontal, this produces 2 rows.
+          crossAxisCount: 2,
+          // Generate 100 widgets that display their index in the List.
+          children: List.generate(l1.length, (int index) {
+            return  Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+              child: SaveCancel(save: l1[index],),
+              //child: createStringField(l1[index]),
+            );
+          })),
+    );
+  }
+
 Widget buildTemplate(){
   List l1=[];
   for(var x in templateFields.keys.toList()){
@@ -446,6 +536,31 @@ Widget buildTemplate(){
   );
 
 }
+
+  Widget buildViewBox(){
+    List temp=[];
+    List l1=[];
+    temp=data.keys.toList();
+    sortList(temp);
+    for(var x in temp){
+      l1.add(x);
+    }
+    return SingleChildScrollView(scrollDirection: Axis.vertical,
+      child: GridView.count( shrinkWrap: true,
+          childAspectRatio: (3),
+          // Create a grid with 2 columns. If you change the scrollDirection to
+          // horizontal, this produces 2 rows.
+          crossAxisCount: 3,
+          // Generate 100 widgets that display their index in the List.
+          children: List.generate(l1.length, (int index) {
+            return  Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],)
+              //child: createStringField(l1[index]),
+            );
+          })),
+    );
+  }
 
 Widget buildFieldBox(){
   List l1=[];
@@ -541,12 +656,6 @@ Widget buildFieldBox(){
       }
     }
     for(var x in technical.keys.toList()){
-     /* print("");
-      print(x);
-      print(technical[x]['value']);
-      print(technical[x]['type']);
-      print(checkType(technical[x]['value'], technical[x]['type']));*/
-
       res=res&&checkType(technical[x]['value'], technical[x]['type']);
     }
     print(res);
@@ -601,6 +710,8 @@ bool checkType(dynamic s,String type) {
   }
   return false;
 }
+
+
 
 
 
