@@ -574,7 +574,7 @@ Widget buildFieldBox(){
         crossAxisCount: 3,
         children: List.generate(l1.length, (int index) {
           return  Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 15),
+            padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 10),
             child:createFieldBoxTile(l1[index],l2[index]),
           );
         })),
@@ -617,7 +617,8 @@ Widget buildFieldBox(){
           });
         }
       }),
-      Text(field)
+      FittedBox(  fit: BoxFit.fitWidth,
+          child: Text(field))
     ],);
   }
 
