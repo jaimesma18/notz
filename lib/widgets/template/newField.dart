@@ -122,7 +122,7 @@ class _NewFieldState extends State<NewField> {
                child: ToggleButtons(children: [
                  Text("Tx"),
                  Text("1..N"),
-                 Text("1.7"),
+                 Text("1.0"),
                  Text("ToF")
                  //Icon(Icons.),
                 // Icon(Icons.clear_outlined)
