@@ -11,7 +11,7 @@ String model;
   final CollectionReference productos=FirebaseFirestore.instance.collection('products');
 
 
- Future log({String model,String type,String field,dynamic before,dynamic after}){
+ Future log({String id,String collection,String type,String field,dynamic before,dynamic after}){
    CollectionReference log = FirebaseFirestore.instance.collection('log');
 
    Map <String,dynamic> m=new Map<String,dynamic>();
@@ -19,7 +19,8 @@ String model;
 
    m['user']=AuthService().userInfo().email;
    m['timestamp']=DateTime.now();
-   m['model']=model;
+   m['collection']=collection;
+   m['id']=id;
    m['type']=type;
    m['field']=field;
    m['before']=before;
@@ -316,6 +317,9 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   }
   if(upc!=null){
     m['upc']=upc;
+    if(before!=null) {
+      log(collection:"Productos",id:model,field: "UPC",before: before,after: upc,type: "Update");
+    }
   }
   if(photos!=null && photosNames!=null){
     List<Map> l=[];
@@ -330,7 +334,7 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   if(bullets!=null){
     m['bullets']=bullets;
     if(before!=null) {
-      log(model:model,field: "Caracteristicas",before: before,after: bullets,type: "Update");
+      log(collection:"Productos",id:model,field: "Caracteristicas",before: before,after: bullets,type: "Update");
     }
   }
   if(technicals!=null){
@@ -415,6 +419,33 @@ Category categoryFromDoc(Map<String,dynamic> m,String id){
       parent: m['parent']);
 
   return c;
+}
+
+Future<void> updateCategory(String id,{String name,String parent,Map template,dynamic before}) {
+  CollectionReference categories = FirebaseFirestore.instance.collection('categories');
+
+
+  Map <String,dynamic> m=new Map<String,dynamic>();
+  if(name!=null){
+    m['name']=name;
+  }
+  if(parent!=null){
+    m['parent']=parent;
+  }
+  if(template!=null){
+    m['template']=template;
+    if(before!=null) {
+      log(collection:"Categorias",id:id,field: "Template",before: before,after: template,type: "Update");
+    }
+  }
+
+
+
+  return categories
+      .doc(id)
+      .update(m)
+      .then((value) => print("Categories Updated"))
+      .catchError((error) => print("Failed to update categories: $error"));
 }
 
 }

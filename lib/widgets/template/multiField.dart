@@ -103,7 +103,7 @@ String displaySingleSelection="";
               )),
                 ),
             ),
-              Positioned(left:10,top: 4,child: Text('${widget.field}\t$displaySingleSelection',style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:Colors.blue),)),
+              Positioned(left:10,top: 4,child: Text('${widget.field} $displaySingleSelection',style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:Colors.blue),)),
               Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
              // Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: Colors.blue),)),
              // Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: Colors.blue),onPressed: widget.onRemove,))

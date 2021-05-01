@@ -27,6 +27,7 @@ class BCode extends StatefulWidget {
 class _BCodeState extends State<BCode> {
   @override
   String upc;
+  String originalUpc;
   bool editing=false;
   bool downloading=false;
   TextEditingController controller=new TextEditingController();
@@ -40,6 +41,7 @@ class _BCodeState extends State<BCode> {
   void initState() {
     super.initState();
     upc=widget.upc??"";
+    originalUpc=upc;
     controller.text=upc;
     if(widget.mobile!=null){
       if(widget.mobile){
@@ -136,7 +138,8 @@ class _BCodeState extends State<BCode> {
                                 upc = controller.text;
                               });
 
-                              await DatabaseService().updateProduct(widget.model,upc:upc);
+                              await DatabaseService().updateProduct(widget.model,upc:upc,before:originalUpc);
+                              originalUpc=upc;
                               setState(() {
                                 editing = !editing;
                               });

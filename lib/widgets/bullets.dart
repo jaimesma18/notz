@@ -214,7 +214,9 @@ print(isMobile);
                       setState(() {
                         editing=!editing;
                       });
-                    await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+                    await updateBullets();
+                   // await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+                     // initialState=bullets;
                     },):IconButton(icon:Icon(Icons.check_circle,color:Colors.green,size: 36,),onPressed: ()async{
                      doneEditing();
                      undo.clear();
@@ -228,7 +230,9 @@ print(isMobile);
                      setState(() {
                        editing=!editing;
                      });
-                     await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+                     await updateBullets();
+                    // await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+                    // initialState=bullets;
                    },),
 
 
@@ -412,4 +416,13 @@ print(isMobile);
     ;
 
   }
+
+  Future updateBullets()async{
+    await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+    initialState.clear();
+    for(var x in bullets){
+      initialState.add(x);
+    }
+  }
+
 }
