@@ -221,24 +221,22 @@ Widget buildCard({dynamic data}){
         String encoded=encode(data);
 
       if(data['field']!=data['fieldController'].text){
-        await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 2, data['field'],type: encoded,newField: data['fieldController'].text);
         setState(() {
           cardsData.remove(data['field']);
           cardsData[data['fieldController'].text]=createMapValues(data['fieldController'].text, encoded);
         });
-
+        await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 2, data['field'],type: encoded,newField: data['fieldController'].text);
         await updateTemplate();
         //cardsData[data['fieldController'].text]['type']=encoded
       }
       else{
         if(data['type']!=encoded) {
           if (encoded != data['type']) {
-            await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 1, data['field'],type: encoded);
             setState(() {
               cardsData[data['field']] =
                   createMapValues(data['field'], encoded);
             });
-
+            await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 1, data['field'],type: encoded);
             await updateTemplate();
           }
         }
@@ -249,6 +247,7 @@ Widget buildCard({dynamic data}){
         setState(() {
           cardsData.remove(data['field']);
         });
+        await updateTemplate();
       }
 
       widget= Padding(padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),

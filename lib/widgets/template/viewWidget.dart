@@ -65,16 +65,8 @@ class _ViewWidgetState extends State<ViewWidget> {
 
     val='$val';
 
-      return SizedBox.expand(
-        child: (
-        FlatButton(child:FittedBox(  fit: BoxFit.fitWidth,
-            child: Text(val,style: TextStyle(color: Colors.blue,fontSize: 14,fontWeight: FontWeight.bold),))
-          ,onPressed: (){
-
-        },
-
-        )),
-      );
+      return (
+      Center(child: SelectableText(val.replaceAll(";"," ; "),style: TextStyle(color: Colors.blue,fontSize: 14,fontWeight: FontWeight.bold),textAlign: TextAlign.center,)));
     }
   }
 
