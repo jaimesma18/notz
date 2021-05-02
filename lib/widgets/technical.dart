@@ -428,6 +428,7 @@ Map data=new Map();
           technical[field]['value']=temp.join(";");
         }
       }
+
     }
 
     onRemove(){
@@ -441,7 +442,36 @@ Map data=new Map();
       });
     }
 
-    return MultiField(field: field,callback: callback,valuesMap:multiValues,onRemove: onRemove,mandatory: mandatory,singleSelection: singleChoice,);
+    bool validate(){
+
+
+      int cont=0;
+
+      if(singleChoice){
+        for(var x in multiValues.values){
+          if(x){
+            cont++;
+          }
+        }
+        if(cont>1){
+         return false;
+        }
+      }
+
+      if(technical[field]['value']!=null) {
+        for (var x in technical[field]['value'].split(";")) {
+          if (!multiValues.keys.contains(x)) {
+            return false;
+          }
+        }
+      }
+
+
+      return true;
+
+    }
+
+    return MultiField(field: field,callback: callback,valuesMap:multiValues,onRemove: onRemove,mandatory: mandatory,singleSelection: singleChoice,validate: validate,);
   }
 
   Widget decideWidget(String field){
@@ -588,6 +618,9 @@ Widget buildTemplate(){
     for(var x in temp){
       l1.add(x);
     }
+    int determineStatus(dynamic s,String type){
+
+    }
     return SingleChildScrollView(scrollDirection: Axis.vertical,
       child: GridView.count( shrinkWrap: true,
           childAspectRatio: (3),
@@ -598,7 +631,7 @@ Widget buildTemplate(){
           children: List.generate(l1.length, (int index) {
             return  Padding(
               padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],)
+              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],valid: checkType(data[l1[index]]['value'], data[l1[index]]['type'])?1:0,)
               //child: createStringField(l1[index]),
             );
           })),
@@ -717,7 +750,36 @@ bool checkType(dynamic s,String type) {
   if (s == null) {
     return true;
   }
-  if(type.startsWith('[')||type.startsWith('(')){
+  if(type.startsWith("(")){
+    if(s.contains(";")){
+      return false;
+    }
+    else{
+      if(s!=""){
+        List val = s.split(";");
+        String st = type.substring(1, type.length - 1);
+        List ty = st.split(";");
+        for (var x in val) {
+          if (!ty.contains(x)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+  }
+  if(type.startsWith('[')) {
+    if(s!=""){
+    List val = s.split(";");
+    String st = type.substring(1, type.length - 1);
+    List ty = st.split(";");
+    for (var x in val) {
+      if (!ty.contains(x)) {
+        return false;
+      }
+    }
+  }
     return true;
   }
   if(type=='bool'){

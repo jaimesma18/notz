@@ -6,8 +6,9 @@ class ViewWidget extends StatefulWidget {
 
   String field;
   dynamic value;
+  int valid;
  
-  ViewWidget({this.field,this.value});
+  ViewWidget({this.field,this.value,this.valid});
   @override
   _ViewWidgetState createState() => _ViewWidgetState();
 }
@@ -34,7 +35,7 @@ class _ViewWidgetState extends State<ViewWidget> {
   Widget wrapCard(){
     return Container(width: 100,height: 80,
       child: Card(elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),side:BorderSide(color: Colors.blue,width: 2) ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),side:BorderSide(color: widget.valid==1?Colors.blue:widget.valid==0?Colors.amber[600]:Colors.red,width: 2) ),
         child: Container(width: 240,
           child: Stack(
             children: [

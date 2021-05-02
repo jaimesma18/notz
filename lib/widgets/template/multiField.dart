@@ -11,7 +11,8 @@ class MultiField extends StatefulWidget {
   Map<String,bool> valuesMap;
   bool mandatory;
   bool singleSelection;
-  MultiField({this.field,this.callback,this.valuesMap,this.onRemove,this.mandatory,this.singleSelection});
+  Function validate;
+  MultiField({this.field,this.callback,this.valuesMap,this.onRemove,this.mandatory,this.singleSelection,this.validate});
   @override
   _MultiFieldState createState() => _MultiFieldState();
 }
@@ -21,9 +22,11 @@ class _MultiFieldState extends State<MultiField> {
 ScrollController scroller=new ScrollController();
 bool neverSelected=true;
 String displaySingleSelection="";
-
+bool isValid;
   @override
   void initState() {
+
+    isValid=widget.validate();
 
     if(widget.singleSelection!=null){
 
@@ -99,11 +102,14 @@ String displaySingleSelection="";
 
                 }
                 widget.callback();
+                setState(() {
+                  isValid=widget.validate();
+                });
                 },
               )),
                 ),
             ),
-              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:Colors.blue),)),
+              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:isValid?Colors.blue:Colors.amber[600]),)),
               Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,)),
               Positioned(right:10,top: 4,child: Tooltip(message: displaySingleSelection,decoration:BoxDecoration(color: Colors.blue,border: Border.all(color: Colors.blue[200]),borderRadius: BorderRadius.circular(6)) ,
                 child: Icon(Icons.info_outline_rounded,color: Colors.blue,size: 18,),
