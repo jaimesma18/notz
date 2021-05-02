@@ -18,27 +18,9 @@ class _NewFieldButtonState extends State<NewFieldButton> {
           Column(
             children: [
 
-              Expanded(flex: 9,
-                child: Container(
-                  child: SizedBox.expand(
-                    child: TextButton(child:
-                    // Text("+",style: TextStyle(fontSize: 128,color: Colors.blue),),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
-                      child: Icon(Icons.add,size: 96,color: Colors.blue,),
-                    ),
-                      onPressed: (){
-                      if(widget.controller.text!="") {
-                        widget.callback();
-                      }
-                      },),
-                  ),
-                ),
-              ),
-
               Expanded(flex: 4,
                 child: Padding(
-                  padding:EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  padding:EdgeInsets.fromLTRB(10, 10, 10, 0),
                   child: Column(
                     children: [
                       Container(height: 30,
@@ -58,6 +40,23 @@ class _NewFieldButtonState extends State<NewFieldButton> {
                       ),
                       Divider(thickness: 2,color: Colors.blue[200],)
                     ],
+                  ),
+                ),
+              ),
+              Expanded(flex: 11,
+                child: Container(
+                  child: SizedBox.expand(
+                    child: TextButton(child:
+                    // Text("+",style: TextStyle(fontSize: 128,color: Colors.blue),),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 40),
+                      child: Icon(Icons.add,size: 96,color: Colors.blue,),
+                    ),
+                      onPressed: (){
+                        if(widget.controller.text!="") {
+                          widget.callback();
+                        }
+                      },),
                   ),
                 ),
               ),

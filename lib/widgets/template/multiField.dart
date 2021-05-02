@@ -28,10 +28,10 @@ String displaySingleSelection="";
     if(widget.singleSelection!=null){
 
       if(widget.singleSelection){
-        displaySingleSelection="(1)";
+        displaySingleSelection="Selecciona solo 1";
       }
       else{
-        displaySingleSelection="(1+)";
+        displaySingleSelection="Selecciona 1 o más";
       }
     }
 
@@ -103,8 +103,11 @@ String displaySingleSelection="";
               )),
                 ),
             ),
-              Positioned(left:10,top: 4,child: Text('${widget.field} $displaySingleSelection',style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:Colors.blue),)),
-              Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
+              Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&(!logicalOr(widget.valuesMap.values.toList()))?Colors.red:Colors.blue),)),
+              Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,)),
+              Positioned(right:10,top: 4,child: Tooltip(message: displaySingleSelection,decoration:BoxDecoration(color: Colors.blue,border: Border.all(color: Colors.blue[200]),borderRadius: BorderRadius.circular(6)) ,
+                child: Icon(Icons.info_outline_rounded,color: Colors.blue,size: 18,),
+              )),
              // Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: Colors.blue),)),
              // Positioned(right:10,bottom: 16,child: IconButton(padding: EdgeInsets.fromLTRB(0, 14, 8, 0),iconSize:18,icon: Icon(Icons.delete,color: Colors.blue),onPressed: widget.onRemove,))
         ]  ),

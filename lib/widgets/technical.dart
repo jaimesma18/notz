@@ -65,18 +65,31 @@ Map data=new Map();
     //technical = json.decode(json.encode(widget.data)):technical=new Map();
 
     for(var x in category.template.keys){
-      templateFields[x]=true;
-      technical[x]=new Map();
-      technical[x]['value']=null;
-      technical[x]['type']=category.template[x];
+      templateFields[x]=false;
+      //technical[x]=new Map();
+      //technical[x]['value']=null;
+      //technical[x]['type']=category.template[x];
+      if(category.template[x].startsWith("*")&&!data.keys.contains(x)){
+        templateFields[x]=true;
+        technical[x]=new Map();
+        technical[x]['value']=null;
+        technical[x]['type']=category.template[x];
+      }
       // allFields.add(createFieldBoxTile(x));
       //template.add(createStringField(x));
     }
 
     for(var x in data.keys.toList()){
-      if(!technical.keys.contains(x)) {
+      if(category.template.keys.contains(x)){
+        templateFields[x]=true;
+      }
+    /*  if(!technical.keys.contains(x)) {
         technical[x]=new Map();
       }
+      else{
+        templateFields[x]=true;
+      }*/
+        technical[x]=new Map();
         technical[x]['value']=data[x]['value'];
         technical[x]['type']=data[x]['type'];
 
@@ -181,6 +194,27 @@ Map data=new Map();
 
   Widget createStringField(String field,{bool mandatory,String type}){
 
+    String tooltip;
+
+
+    if(type=='string'){
+      tooltip="Texto abierto";
+    }
+    if(type=='double'){
+      tooltip="Número positivo o negativo, entero o decimal";
+    }
+    if(type=='int'){
+      tooltip="Número entero positivo o negativo";
+    }
+    if(type=='natural'){
+      tooltip="Cero o número positivo";
+    }
+    if(type=='positive'){
+      tooltip="Número positivo";
+    }
+    if(type=='negative'){
+      tooltip="Número negativo";
+    }
 
     bool validate(String s,String type) {
 
@@ -191,6 +225,7 @@ Map data=new Map();
         return false;
       }
       if(type=='string'){
+
         return s!="";
       }
       if(type=='double') {
@@ -219,6 +254,7 @@ Map data=new Map();
       }
       return false;
     }
+
 
 
     TextEditingController controller=new TextEditingController();
@@ -284,7 +320,7 @@ Map data=new Map();
 
 
 
-    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,mandatory: mandatory??false,type: type,validate: validate,);
+    return StringField(field: field,callback: callback,controller:controller,onRemove: onRemove,mandatory: mandatory??false,type: type,validate: validate,tooltip: tooltip,);
   }
 
   Widget createBoolField(String field,{bool mandatory}){

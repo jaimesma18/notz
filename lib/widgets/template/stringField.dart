@@ -6,15 +6,18 @@ class StringField extends StatefulWidget {
   TextEditingController controller;
   Function callback;
   Function onRemove;
+  String tooltip;
   bool mandatory;
   String type;
   Function validate;
-  StringField({this.field,this.callback,this.controller,this.onRemove,this.mandatory,this.type,this.validate});
+  StringField({this.field,this.callback,this.controller,this.onRemove,this.mandatory,this.type,this.validate,this.tooltip});
   @override
   _StringFieldState createState() => _StringFieldState();
 }
 
 class _StringFieldState extends State<StringField> {
+
+  String tooltip="";
 
   @override
   void initState() {
@@ -53,8 +56,11 @@ class _StringFieldState extends State<StringField> {
               },),
             ),
               Positioned(left:10,top: 4,child: Text(widget.field,style: TextStyle(fontSize: 12,color: widget.mandatory&&widget.controller.text.isEmpty?Colors.red:widget.controller.text.isNotEmpty&&!widget.validate(widget.controller.text, widget.type)?Colors.amber[600]:Colors.blue),)),
-              Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,))
-          ],
+              Positioned(right:0,bottom: 10,child: IconButton(padding: EdgeInsets.fromLTRB(0, 0, 0, 0),iconSize:18,icon: Icon(Icons.delete,color: widget.mandatory?Colors.grey:Colors.blue),onPressed: widget.mandatory?null:widget.onRemove,)),
+              Positioned(right:10,top: 4,child: Tooltip(message: widget.tooltip,decoration:BoxDecoration(color: Colors.blue,border: Border.all(color: Colors.blue[200]),borderRadius: BorderRadius.circular(6)) ,
+                child: Icon(Icons.info_outline_rounded,color: Colors.blue,size: 18,),
+              )),
+            ],
           ),
         ),
       ),
