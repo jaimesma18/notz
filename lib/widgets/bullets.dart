@@ -47,8 +47,7 @@ for(var x in bullets){
 if(widget.mobile!=null){
   isMobile=widget.mobile;
 }
-print("mov");
-print(isMobile);
+
 //addState();
     super.initState();
   }

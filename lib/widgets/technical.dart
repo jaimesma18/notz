@@ -143,6 +143,9 @@ Map data=new Map();
                     if (technical[x]['value'] == null) {
                       technical.remove(x);
                     }
+                    else{
+                      technical[x]['exists']=true;
+                    }
                   }
                   await DatabaseService().updateProduct(
                       widget.model, technicals: technical);
@@ -244,12 +247,19 @@ Map data=new Map();
 
     callback(){
 
+
       if(validate(controller.text,type)) {
         technical[field]['value'] = parse(controller.text);
       }
      else {
-        technical[field]['value'] = controller.text;
+        if(controller.text!="") {
+          technical[field]['value'] = controller.text;
+        }
+        else{
+          technical[field]['value']=null;
+        }
       }
+
        // if(mandatory){
          // technical[field]['value']=null;
        // }

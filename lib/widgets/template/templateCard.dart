@@ -81,10 +81,12 @@ class _TemplateCardState extends State<TemplateCard> {
                 child: IconButton(icon: Icon(Icons.edit,color:editable?Colors.blue:Colors.grey), onPressed: (){
                   setState(() {
 
-                    if(editable){
-                      widget.onDone();
-                    }
-                    editable=!editable;
+    if(widget.values['fieldController'].text!=""){
+    if(editable){
+    widget.onDone();
+    }
+    editable=!editable;
+    }
                   });
                 }))
 

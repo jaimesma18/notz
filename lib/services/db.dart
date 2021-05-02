@@ -302,7 +302,7 @@ Future<void> updateUser(String email,{String name,String lastname,String area,Ma
 }
 
 
-Future<void> updateProduct(String model,{String brand,String title,String upc,List photos,List bullets,Map technicals,Map customs,Map dimensions,Map manufacturer,List keywords,Map photosNames,dynamic before}) {
+Future<void> updateProduct(String model,{String brand,String title,String upc,List photos,List bullets,Map technicals,Map customs,Map dimensions,Map manufacturer,List keywords,Map photosNames,dynamic before,String updateReason}) {
   CollectionReference products = FirebaseFirestore.instance.collection('products');
 
 
@@ -339,6 +339,13 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   }
   if(technicals!=null){
     m['tecnicas']=technicals;
+    if(before!=null) {
+      String reason="Update";
+      if(updateReason!=null){
+        reason=updateReason;
+      }
+      log(collection:"Productos",id:model,field: "Tecnicas",before: before,after: technicals,type: reason);
+    }
   }
   if(customs!=null){
     m['aduana']=customs;
@@ -447,5 +454,47 @@ Future<void> updateCategory(String id,{String name,String parent,Map template,dy
       .then((value) => print("Categories Updated"))
       .catchError((error) => print("Failed to update categories: $error"));
 }
+
+Future updateProductsTechnical(String category,int action,String field,{String type,String newField})async{
+
+   //action: [0: delete, 1:update, 2:rename]
+
+  //List<Product> ps=[];
+  await  FirebaseFirestore.instance
+      .collection('products')
+      .where('category',isEqualTo: category).where('tecnicas.$field.exists',isEqualTo: true)
+      .get()
+      .then((QuerySnapshot snapshot)async{
+    for (var x in snapshot.docs){
+      Product p=productFromDoc(x.data());
+      Map technicals=new Map();
+      for(var x in p.technicals.keys){
+        technicals[x]=p.technicals[x];
+      }
+      if(action==0){
+        String t=p.technicals[field]['type'];
+        if(t.startsWith("*")){
+          t=t.substring(1);
+        }
+        p.technicals[field]['type']=t;
+      }
+      if(action==1){
+        p.technicals[field]['type']=type;
+      }
+      if(action==2){
+        Map m=p.technicals.remove(field);
+        m['type']=type;
+        p.technicals[newField]=m;
+
+      }
+
+      await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
+    }
+
+  });
+
+  //return ps;
+}
+
 
 }

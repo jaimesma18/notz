@@ -3,6 +3,7 @@ import 'package:notz/classes/category.dart';
 import 'package:notz/services/db.dart';
 import 'package:notz/widgets/template/boolField.dart';
 import 'package:notz/widgets/template/multiField.dart';
+import 'package:notz/widgets/template/newFIeldButton.dart';
 import 'package:notz/widgets/template/stringField.dart';
 import 'package:notz/widgets/template/templateCard.dart';
 
@@ -118,7 +119,7 @@ Map original=new Map();
                         color: subs[index]==selectedSubcategory?Colors.blue[400]:Colors.blue[100],
                         hoverColor: Colors.blue[400],
                         child: new Text(subs[index],style: TextStyle(color: Colors.blue[900]))
-                        ,onPressed: (){
+                        ,onPressed: ()async{
                             selectedSubcategory=subs[index];
                             setState(() {
                             loadCards();
@@ -198,60 +199,57 @@ void loadCards(){
 
 }
 
-Widget buildCard({bool newCard,Map data}){
+Widget buildCard({dynamic data}){
     Widget widget= Container();
 
-
-
-
-
-    if(newCard) {
-
-      return Container();
+    if(data=='+') {
+        TextEditingController controller=new TextEditingController();
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+        child: NewFieldButton(controller:controller,callback: ()async{
+          Map m=createMapValues(controller.text,"string");
+         setState(() {
+           cardsData[controller.text]=m;
+         });
+          await updateTemplate();
+        },),
+      );
     }
     else {
-
-
-
 
       void onDone()async{
         String encoded=encode(data);
 
       if(data['field']!=data['fieldController'].text){
+        await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 2, data['field'],type: encoded,newField: data['fieldController'].text);
         setState(() {
           cardsData.remove(data['field']);
           cardsData[data['fieldController'].text]=createMapValues(data['fieldController'].text, encoded);
         });
+
         await updateTemplate();
         //cardsData[data['fieldController'].text]['type']=encoded
       }
       else{
-        if(encoded!=data['type']){
-          setState(() {
-            cardsData[data['field']]=createMapValues(data['field'], encoded);
-          });
+        if(data['type']!=encoded) {
+          if (encoded != data['type']) {
+            await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 1, data['field'],type: encoded);
+            setState(() {
+              cardsData[data['field']] =
+                  createMapValues(data['field'], encoded);
+            });
 
-          await updateTemplate();
+            await updateTemplate();
+          }
         }
+      }      }
 
-      }
-
-
-
-
-
-
-
-      }
-
-
-
-      void onDelete() {
+      void onDelete() async{
+        await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 0, data['field']);
         setState(() {
           cardsData.remove(data['field']);
         });
       }
-
 
       widget= Padding(padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
           child: new TemplateCard(values: data,onDone:onDone ,onDelete: onDelete,));//TemplateCard(fieldController:data['fieldController'],optionsController:data['optionsController'],mandatory: data['mandatory'],selectedType: data['selectedType'],values: data,onDone:onDone ,onDelete: onDelete,));
@@ -265,10 +263,11 @@ Widget buildTemplate(){
       List l1 = [];
       if (cardsData != null) {
       List sorted=sortList(cardsData.keys.toList());
-
+      l1.add("+");
         for (var x in sorted) {
           l1.add(cardsData[x]);
         }
+
       }
 
   //l1.add("+");
@@ -291,7 +290,7 @@ Widget buildTemplate(){
       itemCount: l1.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
       itemBuilder: (context, index) {
-           return  buildCard(newCard: false,data:l1[index]);
+           return  buildCard(data:l1[index]);
 
            // return  buildCard(newCard: false,data:l1[index]);
       })
@@ -358,7 +357,7 @@ String encode(Map m){
   if(m['selectedType'][2]){
     String options=m['optionsController'].text.replaceAll(",", ";");
     options=options.replaceAll(" ", "");
-    options=options.replaceAll(";", " ; ");
+    //options=options.replaceAll(";", " ; ");
     options=options.trim();
     if(options.endsWith(";")){
       options=options.substring(0,options.length-1);
@@ -370,7 +369,7 @@ String encode(Map m){
   if(m['selectedType'][3]){
     String options=m['optionsController'].text.replaceAll(",", ";");
     options=options.replaceAll(" ", "");
-    options=options.replaceAll(";", " ; ");
+    //options=options.replaceAll(";", " ; ");
     options=options.trim();
     if(options.endsWith(";")){
       options=options.substring(0,options.length-1);
@@ -401,7 +400,9 @@ Future updateTemplate()async{
     for(var x in l){
       m[x]=cardsData[x]['type'];
     }
+    subCats[selectedSubcategory].template=m;
   await DatabaseService().updateCategory(subCats[selectedSubcategory].id,template: m,before: original);
+
   original.clear();
   for(var x in m.keys.toList()){
     original[x]=m[x];
