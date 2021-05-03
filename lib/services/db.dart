@@ -457,11 +457,10 @@ Future<void> updateCategory(String id,{String name,String parent,Map template,dy
 
 Future updateProductsTechnical(String category,int action,String field,{String type,String newField})async{
 
-   //action: [0: delete, 1:update, 2:rename]
+   //action: [0: delete, 1:update, 2:rename, 3:add]
 
   if(action>0&&type.startsWith("*")) {
 
-    print("obligatorio");
     await  FirebaseFirestore.instance
         .collection('products')
         .where('category',isEqualTo: category)
@@ -495,6 +494,22 @@ Future updateProductsTechnical(String category,int action,String field,{String t
           Map m=p.technicals.remove(field);
           m['type']=type;
           p.technicals[newField]=m;
+        }
+
+        if(action==3){
+
+          print(p.model);
+          if(p.technicals[field]==null){
+            p.technicals[field]=new Map();
+            p.technicals[field]['value'] = null;
+            p.technicals[field]['type'] = type;
+            p.technicals[field]['exists'] = true;
+          }
+          else{
+            p.technicals[field]['type'] = type;
+          }
+
+
         }
 
         await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
@@ -543,6 +558,10 @@ Future updateProductsTechnical(String category,int action,String field,{String t
         }
 
 
+      }
+
+      if(action==3){
+        p.technicals[field]['type'] = type;
       }
 
 

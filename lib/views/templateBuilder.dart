@@ -4,6 +4,7 @@ import 'package:notz/services/db.dart';
 import 'package:notz/widgets/template/boolField.dart';
 import 'package:notz/widgets/template/multiField.dart';
 import 'package:notz/widgets/template/newFIeldButton.dart';
+import 'package:notz/widgets/template/newTemplateButton.dart';
 import 'package:notz/widgets/template/stringField.dart';
 import 'package:notz/widgets/template/templateCard.dart';
 
@@ -203,19 +204,42 @@ Widget buildCard({dynamic data}){
     Widget widget= Container();
 
     if(data=='+') {
-        TextEditingController controller=new TextEditingController();
+
+      Map values = new Map();
+      void resetInitMap() {
+
+        values['fieldController'] = new TextEditingController();
+        values['mandatory'] = false;
+        values['selectedType'] = List.filled(8, false);
+        values['optionsController'] = new TextEditingController();
+
+
+      }
+      bool validate(){
+        if(cardsData.keys.contains(values['fieldController'].text)){
+          return false;
+        }
+        bool res=false;
+        for(int i=0;i<values['selectedType'].length;i++){
+          res=res||values['selectedType'][i];
+        }
+
+        return res;
+      }
+      resetInitMap();
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-        child: NewFieldButton(controller:controller,callback: ()async{
-          if(!cardsData.containsKey(controller.text)){
-          Map m=createMapValues(controller.text,"string");
-         setState(() {
-           cardsData[controller.text]=m;
-         });
+        child:NewTemplateButton(values: values,validate:validate,onCanceled:resetInitMap,callback: ()async{
+        //  values['field'] = values['fieldController'].text;
+        String field= values['fieldController'].text;
+          String encoded=encode(values);
+          setState(() {
+            cardsData[field]=createMapValues(field, encoded);
+          });
+          await DatabaseService().updateProductsTechnical(subCats[selectedSubcategory].id, 3, field,type: encoded);
           await updateTemplate();
-        }
-          }
-        ,),
+        },),
+    
       );
     }
     else {

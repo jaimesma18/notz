@@ -450,6 +450,10 @@ Map data=new Map();
 
       int cont=0;
 
+
+      if(technical[field]['value']==null){
+        return true;
+      }
       if(singleChoice){
         for(var x in multiValues.values){
           if(x){
@@ -460,6 +464,7 @@ Map data=new Map();
          return false;
         }
       }
+
 
       if(!(technical[field]['value'] is String)){
         return false;
@@ -792,10 +797,13 @@ bool checkType(dynamic s,String type) {
 
   }
   if(type.startsWith('[')) {
+
     if(!(s is String)){
+
       return false;
     }
     if(s!=""){
+
     List val = s.split(";");
     String st = type.substring(1, type.length - 1);
     List ty = st.split(";");
