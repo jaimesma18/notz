@@ -459,7 +459,51 @@ Future updateProductsTechnical(String category,int action,String field,{String t
 
    //action: [0: delete, 1:update, 2:rename]
 
-  //List<Product> ps=[];
+  if(action>0&&type.startsWith("*")) {
+
+    print("obligatorio");
+    await  FirebaseFirestore.instance
+        .collection('products')
+        .where('category',isEqualTo: category)
+        .get()
+        .then((QuerySnapshot snapshot)async{
+      for (var x in snapshot.docs){
+        Product p=productFromDoc(x.data());
+
+        Map technicals=new Map();
+        for(var x in p.technicals.keys){
+          technicals[x]=p.technicals[x];
+        }
+        if(action==1) {
+          if (p.technicals[field] == null) {
+            p.technicals[field] = new Map();
+            p.technicals[field]['value'] = null;
+            p.technicals[field]['type'] = type;
+            p.technicals[field]['exists'] = true;
+          }
+          else {
+            p.technicals[field]['type'] = type;
+          }
+        }
+
+        if(action==2){
+
+          if(p.technicals[field]==null){
+            p.technicals.remove(field);
+          }
+
+          Map m=p.technicals.remove(field);
+          m['type']=type;
+          p.technicals[newField]=m;
+        }
+
+        await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
+      }
+
+    });
+
+  }
+  else{
   await  FirebaseFirestore.instance
       .collection('products')
       .where('category',isEqualTo: category).where('tecnicas.$field.exists',isEqualTo: true)
@@ -472,26 +516,39 @@ Future updateProductsTechnical(String category,int action,String field,{String t
         technicals[x]=p.technicals[x];
       }
       if(action==0){
-        String t=p.technicals[field]['type'];
-        if(t.startsWith("*")){
-          t=t.substring(1);
+        if(p.technicals[field]['value']==null){
+          p.technicals.remove(field);
         }
-        p.technicals[field]['type']=t;
+        else {
+          String t = p.technicals[field]['type'];
+          if (t.startsWith("*")) {
+            t = t.substring(1);
+          }
+          p.technicals[field]['type'] = t;
+        }
       }
       if(action==1){
-        p.technicals[field]['type']=type;
+        if(p.technicals[field]['value']==null){
+          p.technicals.remove(field);
+        }
+        else {
+          p.technicals[field]['type'] = type;
+        }
       }
       if(action==2){
         Map m=p.technicals.remove(field);
         m['type']=type;
-        p.technicals[newField]=m;
+        if(m['value']!=null) {
+          p.technicals[newField] = m;
+        }
+
 
       }
 
+
       await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
     }
-
-  });
+  });}
 
   //return ps;
 }

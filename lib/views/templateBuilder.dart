@@ -207,12 +207,15 @@ Widget buildCard({dynamic data}){
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
         child: NewFieldButton(controller:controller,callback: ()async{
+          if(!cardsData.containsKey(controller.text)){
           Map m=createMapValues(controller.text,"string");
          setState(() {
            cardsData[controller.text]=m;
          });
           await updateTemplate();
-        },),
+        }
+          }
+        ,),
       );
     }
     else {

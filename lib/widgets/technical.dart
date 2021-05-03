@@ -329,7 +329,7 @@ Map data=new Map();
     selected.add(false);
     selected.add(false);
 
-    if(technical[field]['value']!=null){
+    if(technical[field]['value']!=null&& technical[field]['value'] is bool){
       if(technical[field]['value']){
         selected[0]=true;
       }
@@ -365,6 +365,7 @@ Map data=new Map();
 
   Widget createMultiField(String field,String values,bool singleChoice,{bool mandatory}){
 
+
     Map<String,bool> multiValues=new Map<String,bool>();
     values=values.substring(0,values.length-1);
     List temp=[];
@@ -379,8 +380,10 @@ Map data=new Map();
     for(var x in temp) {
       multiValues[x] = false;
     }
+    String actual;
+    if(technical[field]['value'] is String)
+      actual =technical[field]['value'];
 
-    String actual=technical[field]['value'];
     if(actual!=null){
       selectedValues=actual.split(';');
       for(var x in selectedValues){
@@ -458,6 +461,9 @@ Map data=new Map();
         }
       }
 
+      if(!(technical[field]['value'] is String)){
+        return false;
+      }
       if(technical[field]['value']!=null) {
         for (var x in technical[field]['value'].split(";")) {
           if (!multiValues.keys.contains(x)) {
@@ -491,10 +497,9 @@ Map data=new Map();
     }
     else {
 
+
       type = technical[field]['type'];
       bool mandatory = type.startsWith("*");
-
-
 
 
       if (type.endsWith("string")) {
@@ -616,10 +621,22 @@ Widget buildTemplate(){
     temp=data.keys.toList();
     sortList(temp);
     for(var x in temp){
-      l1.add(x);
+        l1.add(x);
+
+
     }
     int determineStatus(dynamic s,String type){
 
+      int res=1;
+        if(s==null){
+          res=-1;
+        }
+        else{
+          if(!checkType(s,type)){
+            res=0;
+          }
+        }
+        return res;
     }
     return SingleChildScrollView(scrollDirection: Axis.vertical,
       child: GridView.count( shrinkWrap: true,
@@ -631,7 +648,7 @@ Widget buildTemplate(){
           children: List.generate(l1.length, (int index) {
             return  Padding(
               padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],valid: checkType(data[l1[index]]['value'], data[l1[index]]['type'])?1:0,)
+              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],valid: determineStatus(data[l1[index]]['value'], data[l1[index]]['type']),)
               //child: createStringField(l1[index]),
             );
           })),
@@ -751,7 +768,12 @@ bool checkType(dynamic s,String type) {
     return true;
   }
   if(type.startsWith("(")){
+
+    if(!(s is String)){
+      return false;
+    }
     if(s.contains(";")){
+
       return false;
     }
     else{
@@ -770,6 +792,9 @@ bool checkType(dynamic s,String type) {
 
   }
   if(type.startsWith('[')) {
+    if(!(s is String)){
+      return false;
+    }
     if(s!=""){
     List val = s.split(";");
     String st = type.substring(1, type.length - 1);
