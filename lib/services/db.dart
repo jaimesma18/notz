@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:notz/classes/Product.dart';
 import 'package:notz/classes/User.dart';
 import 'package:notz/classes/category.dart';
+import 'package:notz/classes/change.dart';
 import 'package:notz/services/auth.dart';
 import 'package:notz/views/categories.dart';
 class DatabaseService{
@@ -11,7 +12,7 @@ String model;
   final CollectionReference productos=FirebaseFirestore.instance.collection('products');
 
 
- Future log({String id,String collection,String type,String field,dynamic before,dynamic after}){
+ /*Future log({String id,String collection,String type,String field,dynamic before,dynamic after}){
    CollectionReference log = FirebaseFirestore.instance.collection('log');
 
    Map <String,dynamic> m=new Map<String,dynamic>();
@@ -33,7 +34,43 @@ String model;
        .then((value) => print("Log added"))
        .catchError((error) => print("Failed to add log: $error"));
 
- }
+ }*/
+Future logMultiple(List<Change> changes)async{
+  for(var x in changes){
+    log(x);
+  }
+}
+
+Future log(Change change){
+  
+  bool logEnabled=true;
+  
+  if(logEnabled) {
+    CollectionReference log = FirebaseFirestore.instance.collection('log');
+
+    Map <String, dynamic> m = new Map<String, dynamic>();
+
+
+    m['user'] = change.username??AuthService().userInfo().email;
+    m['timestamp'] = change.timestamp??DateTime.now();
+    m['collection'] = change.collection;
+    m['id'] = change.id;
+    m['type'] = change.type;
+    m['field'] = change.field;
+    m['before'] = change.before;
+    m['after'] = change.after;
+    m['snapshotBefore']=change.snapshotBefore;
+    m['snapshotAfter']=change.snapshotAfter;
+    m['notes']=change.notes;
+
+
+    return  log
+        .doc()
+        .set(m)
+        .then((value) => print("Log added"))
+        .catchError((error) => print("Failed to add log: $error"));
+  }
+}
 
 Product productFromDoc(Map<String,dynamic> m){
   Product p;
@@ -302,10 +339,17 @@ Future<void> updateUser(String email,{String name,String lastname,String area,Ma
 }
 
 
-Future<void> updateProduct(String model,{String brand,String title,String upc,List photos,List bullets,Map technicals,Map customs,Map dimensions,Map manufacturer,List keywords,Map photosNames,dynamic before,String updateReason}) {
+Future<void> updateProduct(String model,{String brand,String title,String upc,List photos,List bullets,Map technicals,Map customs,Map dimensions,Map manufacturer,List keywords,Map photosNames,dynamic change}){//dynamic before,String updateReason}) {
   CollectionReference products = FirebaseFirestore.instance.collection('products');
 
-
+if(change!=null) {
+  if (change is List) {
+    logMultiple(change);
+  }
+  else {
+    log(change);
+  }
+}
 
 
   Map <String,dynamic> m=new Map<String,dynamic>();
@@ -317,9 +361,9 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   }
   if(upc!=null){
     m['upc']=upc;
-    if(before!=null) {
+    /*if(before!=null) {
       log(collection:"Productos",id:model,field: "UPC",before: before,after: upc,type: "Update");
-    }
+    }*/
   }
   if(photos!=null && photosNames!=null){
     List<Map> l=[];
@@ -333,19 +377,19 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   }
   if(bullets!=null){
     m['bullets']=bullets;
-    if(before!=null) {
+    /*if(before!=null) {
       log(collection:"Productos",id:model,field: "Caracteristicas",before: before,after: bullets,type: "Update");
-    }
+    }*/
   }
   if(technicals!=null){
     m['tecnicas']=technicals;
-    if(before!=null) {
+   /* if(before!=null) {
       String reason="Update";
       if(updateReason!=null){
         reason=updateReason;
       }
       log(collection:"Productos",id:model,field: "Tecnicas",before: before,after: technicals,type: reason);
-    }
+    }*/
   }
   if(customs!=null){
     m['aduana']=customs;
@@ -441,9 +485,9 @@ Future<void> updateCategory(String id,{String name,String parent,Map template,dy
   }
   if(template!=null){
     m['template']=template;
-    if(before!=null) {
+    /*if(before!=null) {
       log(collection:"Categorias",id:id,field: "Template",before: before,after: template,type: "Update");
-    }
+    }*/
   }
 
 
@@ -512,7 +556,7 @@ Future updateProductsTechnical(String category,int action,String field,{String t
 
         }
 
-        await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
+        //await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
       }
 
     });
@@ -565,7 +609,7 @@ Future updateProductsTechnical(String category,int action,String field,{String t
       }
 
 
-      await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
+     // await updateProduct(p.model,technicals: p.technicals,before: technicals,updateReason: "Triggered");
     }
   });}
 

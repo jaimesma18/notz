@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:notz/classes/change.dart';
 import 'package:notz/services/db.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:notz/classes/stack.dart' as stk;
@@ -31,6 +32,14 @@ class _BulletsState extends State<Bullets> {
   ScrollController scroller=new ScrollController();
   ScrollController scroller2=new ScrollController();
   bool isMobile;//=false;
+  
+
+  List changes=[];
+  Change change;
+  int changesIndex=-1;
+  stk.Stack<Change> redoChanges=stk.Stack();
+
+
 
 
 
@@ -38,8 +47,9 @@ class _BulletsState extends State<Bullets> {
 
   @override
   void initState() {
-bullets=widget.bullets;
+bullets=widget.bullets??[];
 
+ initChange();
 for(var x in bullets){
   initialState.add(x);
 }
@@ -52,25 +62,89 @@ if(widget.mobile!=null){
     super.initState();
   }
 
+  void initChange(){
+    change  =new Change(field: "Bullets",collection: "Products",id:widget.model);
+  }
+
+void beforeChange(){
+  if(undo.isEmpty){
+    change.snapshotBefore=initialState;
+  }
+  else{
+    change.snapshotBefore=undo.peek();
+  }
 
 
+  //print(change.snapshotBefore);
 
-  void addState(){
+}
+
+void afterChange(){
+
+    change.snapshotAfter=undo.peek();
+    bool res=true;
+    while(res){
+      res=change.snapshotAfter.remove("");
+    }
+    if(change.snapshotAfter.length>change.snapshotBefore.length){
+      change.type="add";
+      change.before=null;
+      change.after=change.snapshotAfter[changesIndex];
+    }
+    if(change.snapshotAfter.length<change.snapshotBefore.length){
+      change.type="delete";
+      change.before=change.snapshotBefore[changesIndex];
+      change.after=null;
+    }
+    if(change.snapshotAfter.length==change.snapshotBefore.length){
+      change.type="update";
+      change.before=change.snapshotBefore[changesIndex];
+      change.after=change.snapshotAfter[changesIndex];
+    }
+  }
+
+  void printChanges(){
+    print('PRINTING CHANGES (${changes.length})');
+    for(var change in changes) {
+      print(change.type);
+      print('Before: ${change.before}');
+      print('After: ${change.after}');
+      print(change.snapshotBefore);
+      print(change.snapshotAfter);
+      print("Notes: ${change.notes}");
+      print("\n");
+    }
+  }
+  void addState({bool fromReorder}){
+//fromReorder es para no guardar el Change aqui y si guardarlo desde onReorder por el tema de los 2 indices
+
+   // if(fromReorder==null||!fromReorder) {
+      beforeChange();
+   // }
     List temp=[];
     for(var x in bullets){
       temp.add(x);
     }
     undo.push(temp);
-    print("added");
-    print(temp);
+    print("add State...");
+
+
+    if(fromReorder==null||!fromReorder) {
+      afterChange();
+      change.timestamp=DateTime.now();
+      changes.add(change);
+      initChange();
+    }
+
+
   }
 
   void doneEditing(){
     if(editingBulletIndex>=0) {
-
       bullets[editingBulletIndex] = editingBullet;
       addState();
       editingBulletIndex=-1;
+      changesIndex=-1;
     }
   }
 
@@ -125,6 +199,7 @@ if(widget.mobile!=null){
                     },)),
                     Expanded(flex:exp,child: IconButton(icon: Icon(Icons.delete,),onPressed: (){
                       doneEditing();
+                      changesIndex=i;
                       setState(() {
 
                         bullets.removeAt(i);
@@ -140,10 +215,12 @@ if(widget.mobile!=null){
                           width: 400,
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                            child: new TextField(keyboardType: TextInputType.multiline,focusNode:focusNode,maxLines:null,style:TextStyle(fontSize: 14),controller: tc,onChanged: (val){
+                            child: new TextField(
+
+                              keyboardType: TextInputType.multiline,focusNode:focusNode,maxLines:null,style:TextStyle(fontSize: 14),controller: tc,onChanged: (val){
                             //bullets[i]=val;
                               editingBulletIndex=i;
-                            //  addState();
+                              changesIndex=i;
                          editingBullet=val;
 
                             },
@@ -167,6 +244,8 @@ if(widget.mobile!=null){
     deviceWidth>=768?isMobile=false:isMobile=true;
 
     void _onReorder(int oldIndex, int newIndex) {
+      //changesIndex=oldIndex;
+
       doneEditing();
       dynamic old=bullets.removeAt(oldIndex);
       bullets.insert(newIndex, old);
@@ -174,7 +253,16 @@ if(widget.mobile!=null){
       setState(() {
         buildTiles(width: deviceWidth);
       });
-      addState();
+      addState(fromReorder: true);
+      change.before=oldIndex;
+      change.type="reorder";
+      change.after=newIndex;
+      change.snapshotAfter=undo.peek();
+      change.notes=change.snapshotBefore[oldIndex];
+      change.timestamp=DateTime.now();
+      changes.add(change);
+      //changesIndex=-1;
+      initChange();
 
     }
 
@@ -189,6 +277,7 @@ if(widget.mobile!=null){
         children: [
           widget.edit?!editing?FlatButton.icon(icon:Icon(Icons.edit,color:Colors.blue),label: Text("Editar (${bullets.length} características)",style: TextStyle(color: Colors.blue,),),onPressed: (){
             bulletsTemp.clear();
+            changes.clear();
             for(var x in bullets){
               bulletsTemp.add(x);
             }
@@ -213,6 +302,7 @@ if(widget.mobile!=null){
                       setState(() {
                         editing=!editing;
                       });
+                    printChanges();
                     await updateBullets();
                    // await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
                      // initialState=bullets;
@@ -229,6 +319,7 @@ if(widget.mobile!=null){
                      setState(() {
                        editing=!editing;
                      });
+                     printChanges();
                      await updateBullets();
                     // await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
                     // initialState=bullets;
@@ -242,6 +333,8 @@ if(widget.mobile!=null){
                       bullets.clear();
                       undo.clear();
                       redo.clear();
+                      changes.clear();
+                      initChange();
                       for(var x in bulletsTemp){
                         bullets.add(x);
                       }
@@ -252,6 +345,8 @@ if(widget.mobile!=null){
                      bullets.clear();
                      undo.clear();
                      redo.clear();
+                     changes.clear();
+                     initChange();
                      for(var x in bulletsTemp){
                        bullets.add(x);
                      }
@@ -282,6 +377,9 @@ if(widget.mobile!=null){
                       doneEditing();
                       bullets.clear();
                       setState(() {
+                        if(changes.isNotEmpty){
+                          redoChanges.push(changes.removeLast());
+                        }
                         if(!undo.isEmpty){
 
                           redo.push( undo.pop());
@@ -306,6 +404,9 @@ if(widget.mobile!=null){
                      doneEditing();
                       bullets.clear();
                       setState(() {
+                        if(!redoChanges.isEmpty){
+                          changes.add(redoChanges.pop());
+                        }
                         if(!redo.isEmpty){
 
                           undo.push( redo.pop());
@@ -417,7 +518,7 @@ if(widget.mobile!=null){
   }
 
   Future updateBullets()async{
-    await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
+    await DatabaseService().updateProduct(widget.model,bullets: bullets,change: changes);//,before: initialState);
     initialState.clear();
     for(var x in bullets){
       initialState.add(x);

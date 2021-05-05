@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:notz/classes/Product.dart';
+import 'package:notz/classes/change.dart';
 import 'package:notz/services/barcodeServices/barcodeAbstract.dart';
 import 'package:notz/services/db.dart';
 
@@ -138,7 +139,33 @@ class _BCodeState extends State<BCode> {
                                 upc = controller.text;
                               });
 
-                              await DatabaseService().updateProduct(widget.model,upc:upc,before:originalUpc);
+                              String type;
+                              String oldValue;
+                              String newValue;
+
+
+                              if(originalUpc==null||originalUpc==""){
+                                type="add";
+                                oldValue=null;
+                                newValue=upc;
+                              }
+                              else {
+                                if (upc == null || upc == "") {
+                                  type = "delete";
+                                  oldValue = originalUpc;
+                                  newValue = null;
+                                }
+                                else{
+                                  type = "update";
+                                  oldValue = originalUpc;
+                                  newValue = upc;
+                                }
+                              }
+
+                              Change change=new Change(timestamp:DateTime.now(),collection: "Products",id:widget.model,field: "UPC",
+                              before: oldValue,snapshotBefore: oldValue,after: newValue,snapshotAfter: newValue,type: type);
+
+                              await DatabaseService().updateProduct(widget.model,upc:upc,change: change);//before:originalUpc);
                               originalUpc=upc;
                               setState(() {
                                 editing = !editing;
