@@ -343,7 +343,7 @@ Future<void> updateProduct(String model,{String brand,String title,String upc,Li
   CollectionReference products = FirebaseFirestore.instance.collection('products');
 
 if(change!=null) {
-  if (change is List) {
+  if (change is List<Change>) {
     logMultiple(change);
   }
   else {

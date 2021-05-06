@@ -34,7 +34,7 @@ class _BulletsState extends State<Bullets> {
   bool isMobile;//=false;
 
 
-  List changes=[];
+  List<Change> changes=[];
   Change change;
   int changesIndex=-1;
   stk.Stack<Change> redoChanges=stk.Stack();
@@ -129,7 +129,7 @@ void afterChange(){
 
   undo.push(temp);
 
-  print("add State...");
+  //print("add State...");
 
 
     if(fromReorder==null||!fromReorder) {
@@ -315,7 +315,7 @@ void afterChange(){
                       setState(() {
                         editing=!editing;
                       });
-                    printChanges();
+                   // printChanges();
                     await updateBullets();
                    // await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
                      // initialState=bullets;
@@ -332,7 +332,7 @@ void afterChange(){
                      setState(() {
                        editing=!editing;
                      });
-                     printChanges();
+                   //  printChanges();
                      await updateBullets();
                     // await DatabaseService().updateProduct(widget.model,bullets: bullets,before: initialState);
                     // initialState=bullets;
@@ -513,7 +513,7 @@ void afterChange(){
                   setState(() {
 
                   });
-                  print(index);
+                 // print(index);
                   //this callback is optional
                   debugPrint('${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
                 },
