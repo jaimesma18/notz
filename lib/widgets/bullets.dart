@@ -32,7 +32,7 @@ class _BulletsState extends State<Bullets> {
   ScrollController scroller=new ScrollController();
   ScrollController scroller2=new ScrollController();
   bool isMobile;//=false;
-  
+
 
   List changes=[];
   Change change;
@@ -121,12 +121,15 @@ void afterChange(){
    // if(fromReorder==null||!fromReorder) {
       beforeChange();
    // }
-    List temp=[];
+
+  List temp=[];
     for(var x in bullets){
       temp.add(x);
     }
-    undo.push(temp);
-    print("add State...");
+
+  undo.push(temp);
+
+  print("add State...");
 
 
     if(fromReorder==null||!fromReorder) {
@@ -134,6 +137,7 @@ void afterChange(){
       change.timestamp=DateTime.now();
       changes.add(change);
       initChange();
+
     }
 
 
@@ -199,10 +203,13 @@ void afterChange(){
                     },)),
                     Expanded(flex:exp,child: IconButton(icon: Icon(Icons.delete,),onPressed: (){
                       doneEditing();
+
                       changesIndex=i;
+
                       setState(() {
 
-                        bullets.removeAt(i);
+                        dynamic x=bullets.removeAt(i);
+                       if(x!="")
                        addState();
                       });
                     },)),
@@ -247,22 +254,28 @@ void afterChange(){
       //changesIndex=oldIndex;
 
       doneEditing();
+      if(bullets[oldIndex]!=""){
       dynamic old=bullets.removeAt(oldIndex);
+
       bullets.insert(newIndex, old);
 
       setState(() {
         buildTiles(width: deviceWidth);
       });
-      addState(fromReorder: true);
-      change.before=oldIndex;
-      change.type="reorder";
-      change.after=newIndex;
-      change.snapshotAfter=undo.peek();
-      change.notes=change.snapshotBefore[oldIndex];
-      change.timestamp=DateTime.now();
-      changes.add(change);
+
+
+        addState(fromReorder: true);
+        change.before = oldIndex;
+        change.type = "reorder";
+        change.after = newIndex;
+        change.snapshotAfter = undo.peek();
+        change.notes = change.snapshotBefore[oldIndex];
+        change.timestamp = DateTime.now();
+        changes.add(change);
+        initChange();
+      }
       //changesIndex=-1;
-      initChange();
+
 
     }
 
