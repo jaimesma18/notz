@@ -33,6 +33,7 @@ class _BulletsState extends State<Bullets> {
   ScrollController scroller2=new ScrollController();
   bool isMobile;//=false;
 
+  //List<bool> focuses=[];
 
   List<Change> changes=[];
   Change change;
@@ -48,7 +49,7 @@ class _BulletsState extends State<Bullets> {
   @override
   void initState() {
 bullets=widget.bullets??[];
-
+//resetFocuses();
  initChange();
 for(var x in bullets){
   initialState.add(x);
@@ -61,6 +62,16 @@ if(widget.mobile!=null){
 //addState();
     super.initState();
   }
+
+  /*void resetFocuses({bool addingNew}){
+    focuses=[];
+    focuses=new List.filled(bullets.length, false,growable: true);
+    if(addingNew!=null&&addingNew){
+      focuses[focuses.length-1]=true;
+    }
+    print("Focuses: (${focuses.length})");
+    print(focuses);
+  }*/
 
   void initChange(){
     change  =new Change(field: "Bullets",collection: "Products",id:widget.model);
@@ -87,6 +98,8 @@ void afterChange(){
       res=change.snapshotAfter.remove("");
     }
     if(change.snapshotAfter.length>change.snapshotBefore.length){
+      print(changesIndex);
+      print(change.snapshotAfter);
       change.type="add";
       change.before=null;
       change.after=change.snapshotAfter[changesIndex];
@@ -121,16 +134,13 @@ void afterChange(){
    // if(fromReorder==null||!fromReorder) {
       beforeChange();
    // }
-
   List temp=[];
     for(var x in bullets){
       temp.add(x);
     }
-
   undo.push(temp);
 
   //print("add State...");
-
 
     if(fromReorder==null||!fromReorder) {
       afterChange();
@@ -169,6 +179,7 @@ void afterChange(){
     for(int i=0;i<bullets.length;i++){
      FocusNode focusNode = FocusNode();
      focusNode.addListener(() {
+       //resetFocuses();
        if(!focusNode.hasFocus) {
 
          if(editingBulletIndex>=0) {
@@ -181,12 +192,20 @@ void afterChange(){
        }
        else{
         editingBullet="";
+       // setState(() {
+
+
+         // focuses[i]=true;
+
+      //  });
        }
+      // print("FL");
+      // print(focuses);
      });
      // for(var x in bullets){
         TextEditingController tc =new TextEditingController(text:bullets[i]);
         controllers.add(tc);
-
+        
 
 
 
@@ -209,6 +228,7 @@ void afterChange(){
                       setState(() {
 
                         dynamic x=bullets.removeAt(i);
+                       // resetFocuses();
                        if(x!="")
                        addState();
                       });
@@ -224,6 +244,7 @@ void afterChange(){
                             padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                             child: new TextField(
 
+                              //showCursor: focuses[i],
                               keyboardType: TextInputType.multiline,focusNode:focusNode,maxLines:null,style:TextStyle(fontSize: 14),controller: tc,onChanged: (val){
                             //bullets[i]=val;
                               editingBulletIndex=i;
@@ -254,6 +275,7 @@ void afterChange(){
       //changesIndex=oldIndex;
 
       doneEditing();
+      //resetFocuses();
       if(bullets[oldIndex]!=""){
       dynamic old=bullets.removeAt(oldIndex);
 
@@ -310,6 +332,7 @@ void afterChange(){
                     while(bullets.contains("")) {
                       bullets.remove("");
                     }
+                     // resetFocuses();
 
 
                       setState(() {
@@ -326,7 +349,7 @@ void afterChange(){
                      while(bullets.contains("")) {
                        bullets.remove("");
                      }
-
+                    // resetFocuses();
 
 
                      setState(() {
@@ -344,18 +367,22 @@ void afterChange(){
 
                    !isMobile? FlatButton.icon(icon:Icon(Icons.cancel,color:Colors.red),label: Text("Cancelar",style: TextStyle(color: Colors.red,),),onPressed: (){
                       bullets.clear();
+                      //resetFocuses();
                       undo.clear();
                       redo.clear();
                       changes.clear();
                       initChange();
+
                       for(var x in bulletsTemp){
                         bullets.add(x);
                       }
+
                       setState(() {
                         editing=!editing;
                       });
                     },):IconButton(icon:Icon(Icons.cancel,color:Colors.red,size:36 ,),onPressed: (){
                      bullets.clear();
+                     //resetFocuses();
                      undo.clear();
                      redo.clear();
                      changes.clear();
@@ -370,20 +397,29 @@ void afterChange(){
                     SizedBox(width: isMobile?12:4,),
 
                     !isMobile?FlatButton.icon(icon:Icon(Icons.add_circle,color:Colors.blue),label: Text("Agregar Bullet",style: TextStyle(color: Colors.blue,),),onPressed: (){
-                      doneEditing();
-                      setState(() {
-                        bullets.add("");
-                        scroller.jumpTo(scroller.position.maxScrollExtent+120);
-                     // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
-                      });
 
+                        doneEditing();
+                        if(!bullets.contains("")) {
+                        setState(() {
+                          bullets.add("");
+                          //resetFocuses(addingNew: true);
+                          scroller.jumpTo(scroller.position.maxScrollExtent +
+                              120);
+                          // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
+                        });
+                      }
+                      else{
+                        print(bullets);
+                      }
 
                     },):IconButton(icon:Icon(Icons.add_circle,color:Colors.blue,size: 36,),onPressed: (){
                       doneEditing();
+                      if(!bullets.contains("")) {
                       setState(() {
                         bullets.add("");
+                        //resetFocuses(addingNew: true);
                         // _tiles.add(addSingleTile(controller:new TextEditingController(text: ""),index:_tiles.length));
-                      });
+                      });}
                     },),
                     SizedBox(width: isMobile?12:4,),
                     IconButton(icon:Icon(Icons.undo,color:undo.isEmpty?Colors.grey[400]:Colors.blue,size:isMobile?36:24),onPressed:undo.isEmpty?null:(){
@@ -408,7 +444,7 @@ void afterChange(){
                             bullets.add(x);
                           }
                         }
-
+                        //resetFocuses();
                       });
 
                     },),
@@ -435,6 +471,7 @@ void afterChange(){
                             bullets.add(x);
                           }
                         }
+                        //resetFocuses();
                       /*  if(redo.isEmpty){
                           for(var x in bulletsTemp){
                             bullets.add(x);
