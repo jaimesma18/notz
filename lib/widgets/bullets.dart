@@ -205,7 +205,7 @@ void afterChange(){
      // for(var x in bullets){
         TextEditingController tc =new TextEditingController(text:bullets[i]);
         controllers.add(tc);
-        
+
 
 
 
