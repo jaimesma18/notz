@@ -6,13 +6,15 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/services.dart';
 import 'package:notz/services/storageManager.dart';
 
 
 class Carousel extends StatefulWidget {
-  List urls;
+  List images;
+  String model;
 
-  Carousel({this.urls});
+  Carousel({this.images,this.model});
   @override
   _CarouselState createState() => _CarouselState();
 }
@@ -22,7 +24,7 @@ class _CarouselState extends State<Carousel> {
   List imgSlider;
   final CarouselController _controller = CarouselController();
   //List<Uint8List>bytes=[];
-  List urls=[];
+  List<Uint8List> bytes=[];
   bool imageLoaded=false;
 
  // List<String> urls=[];
@@ -31,29 +33,39 @@ class _CarouselState extends State<Carousel> {
   void initState() {
     super.initState();
 
-    urls=widget.urls;
-    init(urls);
-   //imgSlider=mapImagesFromBytes(bytes);
+    init().whenComplete(() {
+      if(this.mounted) {
+        setState(() {
+          imageLoaded = bytes.isNotEmpty;
+        });
+      }
+    });
+   // urls=widget.images;
+   // init(urls);
 
 
-    //getFirebaseImageFolder2();
   }
 
-  Future init(List urls)async{
+  Future init()async{
+
+
 
    // urls=await getFirebaseUrls(model);
-    imgSlider=mapImagesFromUrl(urls);
+   // imgSlider=mapImagesFromUrl(urls);
 
     //Si se activa esto, cambiar urls por bytes en Scaffold
-   // List<Uint8List> bytes=await getFirebaseImages(model);
-   // imgSlider=mapImagesFromBytes(bytes);
+   // List<Uint8List> 
+    
+    bytes=await getFirebaseImages();
 
-   // mapQ(l);
-    if(this.mounted) {
+    imgSlider=mapImagesFromBytes(bytes);
+
+  
+   /* if(this.mounted) {
       setState(() {
         imageLoaded = true;
       });
-    }
+    }*/
 
 
 
@@ -78,7 +90,7 @@ class _CarouselState extends State<Carousel> {
     )).toList();
     return imageSliders;
   }
-  List mapImagesFromUrl(List imgList){
+ /* List mapImagesFromUrl(List imgList){
     final List<Widget> imageSliders = imgList.map((item) => Container(
       child: Container(
         margin: EdgeInsets.all(5.0),
@@ -94,7 +106,7 @@ class _CarouselState extends State<Carousel> {
       ),
     )).toList();
     return imageSliders;
-  }
+  }*/
 
   Future<List<String>> getFirebaseUrls(String model) async{
     List<String> urls=[];
@@ -115,13 +127,31 @@ class _CarouselState extends State<Carousel> {
 
 
 
-  Future<List<Uint8List>> getFirebaseImages(String model) async{
+  Future<List<Uint8List>> getFirebaseImages() async{
 
+    Uint8List byte;
 
-    //StorageManager().downloadFilesFromDirectory("/productos/$model").then((value) => print("vl: ${value.length}"));
-    List l=await StorageManager().downloadFilesFromDirectory("productos/$model");
+    List<Uint8List> l=[];
+    print(widget.images);
+    for(var x in widget.images){
+      if(widget.images!=null&&x!=null) {
+        byte = await StorageManager().downloadFile(
+            "productos/${widget.model}/$x");
+      }
+     /* else{
+        byte=(await rootBundle.load('assets/images/logo_Lloyds.jpg'))
+            .buffer
+            .asUint8List();
+      }
+      if(byte==null){
+        (await rootBundle.load('assets/images/logo_Lloyds.jpg'))
+            .buffer
+            .asUint8List();
+      }*/
 
-    print(l);
+      l.add(byte);
+     // l.add(await StorageManager().downloadFile("productos/${widget.model}/$x"));
+    }
 
     return l;
   }
@@ -162,11 +192,10 @@ class _CarouselState extends State<Carousel> {
                     Expanded(flex: 5,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                       // children: urls.map((url) {
-                        //  int index = urls.indexOf(url);
-                        children: //bullets,
-                        urls.map((x) {
-                          int index = urls.indexOf(x);
+
+                        children:
+                        bytes.map((x) {
+                          int index = bytes.indexOf(x);
                           return Container(
                             width: 8.0,
                             height: 8.0,
@@ -193,7 +222,12 @@ class _CarouselState extends State<Carousel> {
               ),
             ),
           ]
-      ):Container(),
+      ):Container(
+        child: Image.asset('assets/images/logo_Lloyds.jpg'),
+      ),
     );
+
+
+
   }
 }

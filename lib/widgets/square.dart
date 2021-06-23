@@ -26,15 +26,7 @@ class Square extends StatelessWidget {
           .buffer
           .asUint8List();
     }
-    print("bytes");
-    print(bytes);
 
-
-     /* bytes=(await rootBundle.load('assets/images/logo_Lloyds.jpg'))
-          .buffer
-          .asUint8List();
-      print("si");
-*/
 
     return true;
   }
