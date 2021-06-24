@@ -33,20 +33,20 @@ class _CarouselState extends State<Carousel> {
   void initState() {
     super.initState();
 
-    init().whenComplete(() {
-      if(this.mounted) {
+  //  init().whenComplete(() {
+     /* if(this.mounted) {
         setState(() {
           imageLoaded = bytes.isNotEmpty;
         });
-      }
-    });
+      }*/
+ //   });
    // urls=widget.images;
    // init(urls);
 
 
   }
 
-  Future init()async{
+  Future<bool> init()async{
 
 
 
@@ -60,6 +60,13 @@ class _CarouselState extends State<Carousel> {
 
     imgSlider=mapImagesFromBytes(bytes);
 
+    if(this.mounted) {
+    //  setState(() {
+        imageLoaded = bytes.isNotEmpty;
+    //  });
+    }
+
+    return imageLoaded;
   
    /* if(this.mounted) {
       setState(() {
@@ -132,7 +139,8 @@ class _CarouselState extends State<Carousel> {
     Uint8List byte;
 
     List<Uint8List> l=[];
-    print(widget.images);
+   // print(widget.images);
+    if(widget.images!=null&&widget.images.isNotEmpty)
     for(var x in widget.images){
       if(widget.images!=null&&x!=null) {
         byte = await StorageManager().downloadFile(
@@ -158,10 +166,15 @@ class _CarouselState extends State<Carousel> {
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)=> FutureBuilder(
 
 
+  future: init(),
+  builder: (context, snapshot)
 
+  {
+
+if(snapshot.hasData){
     return Container(height: 400,
 
       child: imageLoaded?Stack(
@@ -223,11 +236,21 @@ class _CarouselState extends State<Carousel> {
             ),
           ]
       ):Container(
-        child: Image.asset('assets/images/logo_Lloyds.jpg'),
+        child: Opacity(opacity: 0.5,
+            child: Image.asset('assets/images/logo_Lloyds.jpg')),
       ),
-    );
+    );}
+else{
+  return Container(
+    height: 400,width: 400,
+      child:
+  Center(
+    child: SizedBox(width: 100,height: 100,
+        child: CircularProgressIndicator()),
+  ),);
+}
 
 
 
-  }
+  });
 }

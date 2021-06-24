@@ -9,12 +9,14 @@ class Square extends StatelessWidget {
   Function f;
   Square(this.p,{this.f});
   Uint8List bytes;
+  bool imageLoaded=false;
 
   Future<bool> getPhoto()async {
 
     if(p.photos2!=null&&p.photos2[0]!=null) {
       bytes = await StorageManager().downloadFile(
           "productos/${p.model}/${p.photos2[0]}");
+      imageLoaded=true;
     }
     else{
       bytes=(await rootBundle.load('assets/images/logo_Lloyds.jpg'))
@@ -74,7 +76,7 @@ class Square extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),)),
               Expanded(flex: 10,
                 child:
-                bytes==null? Image.asset("assets/images/logo_Lloyds.jpg",height: 140,)
+                imageLoaded==false? Opacity(opacity:0.5,child: Image.asset("assets/images/logo_Lloyds.jpg",height: 140,))
                 :Image.memory(bytes,height: 140,)
                 //Image.network(p.photos[0],height: 140,),
               ),
@@ -97,7 +99,7 @@ class Square extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),)),
                 Expanded(flex: 10,
                   child:
-                  bytes==null? Image.asset("assets/images/logo_Lloyds.jpg",height: 140,)
+                  imageLoaded==false? Opacity(opacity:0.5,child: Image.asset("assets/images/logo_Lloyds.jpg",height: 140,))
                       :Image.memory(bytes,height: 140,)
                   //Image.network(p.photos[0], height: 140,),
                 ),
