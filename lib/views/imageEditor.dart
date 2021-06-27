@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notz/widgets/imageUploader.dart';
+import 'package:notz/widgets/imageUploader2.dart';
 
 
 class ImageEditor extends StatefulWidget {

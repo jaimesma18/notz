@@ -13,9 +13,10 @@ class Product{
   List keywords;
   Map manufacturer;
   Map photosName;
+  List photos2;
 
 
-  Product({this.category,this.title,this.model,this.brand,this.bullets,this.technicals,this.upc,this.customs,this.dimensions,this.photos,this.keywords,this.manufacturer,this.photosName});
+  Product({this.category,this.title,this.model,this.brand,this.bullets,this.technicals,this.upc,this.customs,this.dimensions,this.photos,this.keywords,this.manufacturer,this.photosName,this.photos2});
 
 
 

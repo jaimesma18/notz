@@ -99,6 +99,7 @@ Product productFromDoc(Map<String,dynamic> m){
       technicals: m['tecnicas']??new Map(),
     manufacturer: m['fabricante'],
     keywords: m['keywords'],
+    photos2: m['photos'],
 
   );
 

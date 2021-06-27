@@ -132,7 +132,7 @@ Future<Product> downloadProduct(String model)async{
               SizedBox(height: 10,),
               Center(child: Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),)),
               SizedBox(height: 6,),
-              Carousel(urls:product.photos ,),
+              Carousel(images: product.photos2,model: product.model,),
               SizedBox(height: 6,),
               RichText(
                 text: new TextSpan(
