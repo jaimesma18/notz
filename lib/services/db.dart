@@ -75,14 +75,14 @@ Future log(Change change){
 Product productFromDoc(Map<String,dynamic> m){
   Product p;
 
-  List photos=[];
-  Map photosNames=new Map();
+  //List photos=[];
+  //Map photosNames=new Map();
 
-  List tempPhotos=m['fotos'];
+  /*List tempPhotos=m['fotos'];
   for(var x in tempPhotos){
     photos.add(x.keys.toList()[0]);
     photosNames[x.keys.toList()[0]]=x.values.toList()[0];
-  }
+  }*/
 
   p= new Product(
       category: m['category'],
@@ -90,8 +90,8 @@ Product productFromDoc(Map<String,dynamic> m){
       model:m['modelo'],
       brand: m['marca'],
       upc: m['upc'],
-      photos: photos,
-      photosName: photosNames,
+      photos: m['photos'],
+     // photosName: photosNames,
       //photos: m['fotos'],
       dimensions: m['medidas'],
       customs: m['aduana'],
@@ -99,7 +99,7 @@ Product productFromDoc(Map<String,dynamic> m){
       technicals: m['tecnicas']??new Map(),
     manufacturer: m['fabricante'],
     keywords: m['keywords'],
-    photos2: m['photos'],
+
 
   );
 
@@ -366,7 +366,11 @@ if(change!=null) {
       log(collection:"Productos",id:model,field: "UPC",before: before,after: upc,type: "Update");
     }*/
   }
-  if(photos!=null && photosNames!=null){
+  if(photos!=null){
+    m['photos']=photos;
+  }
+
+/*  if(photos!=null && photosNames!=null){
     List<Map> l=[];
     for(var x in photos){
       Map m=new Map();
@@ -375,7 +379,7 @@ if(change!=null) {
     }
 
     m['fotos']=l;//photos;
-  }
+  }*/
   if(bullets!=null){
     m['bullets']=bullets;
     /*if(before!=null) {

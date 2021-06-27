@@ -29,7 +29,7 @@ double height=16;
 final double _iconSize = 90;
 List<Widget> _tiles=[];
 bool attaching=false;
-String ordenar="Ordenare";
+String ordenar="Ordenar";
 bool enabledButton=false;
 Map<String,Uint8List>bytes=new Map<String,Uint8List>();
 
@@ -64,9 +64,10 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
 
   Future init()async{
     photos.clear();
+    bytes.clear();
     _tiles.clear();
     await DatabaseService().getProducto(model).then((value) {
-      photos=value.photos2;
+      photos=value.photos;
       //photosNames=value.photosName;
 
     });
@@ -93,13 +94,15 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
                         await StorageManager().deleteCloudFile(
                             "productos/$model/$x");
 
-                        photos.remove(x);
-                        bytes.remove(x);
 
+                        photos.remove(x);
 
                         await DatabaseService().updateProduct(
                             model, photos: photos);
-                        init();
+                        setState(() {
+                          init();
+                        });
+
                       },)
                 ),
 
@@ -179,9 +182,12 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
           Padding(
             padding: EdgeInsets.fromLTRB(0, height, 0, 0),
             child: Opacity(opacity: enabledButton ? 1 : 0.3,
-              child: RaisedButton(color: Colors.blue,
+              child: RaisedButton(color: enabledButton?Colors.blue:Colors.grey,
                 child: Text(ordenar, style: TextStyle(color: Colors.white),),
                 onPressed: !enabledButton ? null : () async {
+                setState(() {
+                  enabledButton=false;
+                });
                   if (attaching) {
                     if (filePickerResult.files.isNotEmpty) {
                       String name = filePickerResult.files[0].name;
@@ -196,8 +202,15 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
                             "/productos/$model/$name",
                             contentType: "image/jpeg");
 
-                        Reference storageRef = FirebaseStorage.instance.ref(
-                            res.metadata.fullPath);
+                    /*    Reference storageRef = FirebaseStorage.instance.ref(
+                            res.metadata.fullPath);*/
+                        if(photos==null){
+                          photos=[];
+                        }
+                        photos.add(name);
+                        await DatabaseService().updateProduct(model,
+                            photos: photos);
+                        await init();
                         /*  storageRef.getDownloadURL().then((value) async {
                        photos.add(value);
                        photosNames[value] = name;
@@ -223,6 +236,9 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
 
                     await init();
                   }
+                  setState(() {
+                    enabledButton=true;
+                  });
                 },),
             ),
           ),
@@ -284,9 +300,12 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
           Padding(
             padding: EdgeInsets.fromLTRB(0, height, 0, 0),
             child: Opacity(opacity: enabledButton ? 1 : 0.3,
-              child: RaisedButton(color: Colors.blue,
+              child: RaisedButton(color: enabledButton?Colors.blue:Colors.grey,
                 child: Text(ordenar, style: TextStyle(color: Colors.white),),
                 onPressed: !enabledButton ? null : () async {
+                setState(() {
+                  enabledButton=false;
+                });
                   if (attaching) {
                     if (filePickerResult.files.isNotEmpty) {
                       String name = filePickerResult.files[0].name;
@@ -301,8 +320,13 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
                             "/productos/$model/$name",
                             contentType: "image/jpeg");
 
-                        Reference storageRef = FirebaseStorage.instance.ref(
-                            res.metadata.fullPath);
+
+                        photos.add(name);
+                        await DatabaseService().updateProduct(model,
+                            photos: photos);
+                        await init();
+                      /*  Reference storageRef = FirebaseStorage.instance.ref(
+                            res.metadata.fullPath);*/
                         /*  storageRef.getDownloadURL().then((value) async {
                        photos.add(value);
                        photosNames[value] = name;
@@ -328,6 +352,9 @@ Map<String,Uint8List>bytes=new Map<String,Uint8List>();
 
                     await init();
                   }
+                setState(() {
+                  enabledButton=true;
+                });
                 },),
             ),
           ),

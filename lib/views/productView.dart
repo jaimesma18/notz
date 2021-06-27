@@ -201,7 +201,7 @@ Future<Product> downloadProduct(String model)async{
                             ),
 
                             Container(padding:EdgeInsets.all(40),child: Carousel(
-                              images: product.photos2,
+                              images: product.photos,
                               model: product.model,
                               //  urls:product.photos
                             ))]),

@@ -13,9 +13,9 @@ class Square extends StatelessWidget {
 
   Future<bool> getPhoto()async {
 
-    if(p.photos2!=null&&p.photos2[0]!=null) {
+    if(p.photos!=null&&p.photos[0]!=null) {
       bytes = await StorageManager().downloadFile(
-          "productos/${p.model}/${p.photos2[0]}");
+          "productos/${p.model}/${p.photos[0]}");
       imageLoaded=true;
     }
     else{

@@ -45,7 +45,7 @@ bool enabledButton=false;
     _tiles.clear();
     await DatabaseService().getProducto(model).then((value) {
       photos=value.photos;
-      photosNames=value.photosName;
+     // photosNames=value.photosName;
 
     });
 
