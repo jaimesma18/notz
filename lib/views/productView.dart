@@ -10,6 +10,7 @@ import 'package:notz/services/auth.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_image/barcode_image.dart';*/
 import 'package:image/image.dart' as img;
+import 'package:notz/services/storageManager.dart';
 import 'package:notz/widgets/barcode.dart';
 import 'package:notz/widgets/bullets.dart';
 import 'package:notz/widgets/dimensions.dart';
@@ -34,7 +35,7 @@ class _ProductViewState extends State<ProductView> {
   Map permissions;
   bool loaded=false;
   Map data=new Map();
-  //int sgroup;
+  Map<String,Uint8List> bytes=new Map<String,Uint8List>();  //int sgroup;
   //String model="LC-1192";
   Product product;
   TextEditingController search= new TextEditingController();
@@ -54,6 +55,7 @@ class _ProductViewState extends State<ProductView> {
 
     //product=await downloadProduct(model);
     permissions=await _auth.permissions();
+
 
     //int res=await _auth.securityGroup();
 
@@ -99,6 +101,9 @@ Future<Product> downloadProduct(String model)async{
 
         else {
           product = data['product'];
+          getFirebaseImages().whenComplete(() => print('len: ${bytes.length}'));
+         // getFirebaseImages().then((value) => bytes=value);
+         
           selectedWidget = Bullets(bullets: product
               .bullets,edit: permissions[selectedWidgetText]>1,model: product.model,mobile: false,);
 
@@ -189,13 +194,14 @@ Future<Product> downloadProduct(String model)async{
                                {
                                  Map m=new Map();
                                  m['model']=product.model;
-                                 print('pre');
+                                 m['photos']=product.photos;
+                                 m['bytes']=bytes;
                                   await Navigator.pushNamed(context, "/imageEditor",arguments: m);
 
-                                   print('post');
+                              /*     print('post');
                                  product= await  downloadProduct(product.model);
 
-                                 print(product.photos);
+                                 print(product.photos);*/
 
                               },),
                             ),
@@ -203,6 +209,7 @@ Future<Product> downloadProduct(String model)async{
                             Container(padding:EdgeInsets.all(40),child: Carousel(
                               images: product.photos,
                               model: product.model,
+                              bytes: bytes,
                               //  urls:product.photos
                             ))]),
 
@@ -349,6 +356,28 @@ Future<Product> downloadProduct(String model)async{
     //  l.removeLast();
      return SingleChildScrollView(scrollDirection:Axis.horizontal,child: Container(child: IntrinsicHeight(child: Row(mainAxisAlignment:MainAxisAlignment.start,children: l)),));
     }
+  }
+
+  Future<void> getFirebaseImages() async{
+
+    Uint8List byte;
+    bytes.clear();
+
+   // List<Uint8List> l=[];
+    // print(widget.images);
+    if(product!=null&&product.photos.isNotEmpty)
+      for(var x in product.photos){
+        if(x!=null) {
+          byte = await StorageManager().downloadFile(
+              "productos/${product.model}/$x");
+          bytes[x]=byte;
+        }
+      }
+
+    setState(() {
+
+    });
+
   }
 
 

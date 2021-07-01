@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notz/widgets/imageUploader2.dart';
+import 'package:notz/widgets/imageUploader.dart';
 
 
 class ImageEditor extends StatefulWidget {
@@ -23,7 +23,7 @@ class _ImageEditorState extends State<ImageEditor> {
     return Scaffold(
 
       appBar: AppBar(title: Text("Modificar Imagenes"),),
-      body: Center(child: ImageUploader(model: data['model'],)),
+      body: Center(child: ImageUploader(model: data['model'],bytes: data['bytes'],photos: data['photos'],)),
 
 
     );

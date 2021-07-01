@@ -11,10 +11,12 @@ import 'package:notz/services/storageManager.dart';
 
 
 class Carousel extends StatefulWidget {
+  Map<String,Uint8List>bytes;
   List images;
   String model;
 
-  Carousel({this.images,this.model});
+  Carousel({this.images,this.model,this.bytes});
+
   @override
   _CarouselState createState() => _CarouselState();
 }
@@ -49,14 +51,17 @@ class _CarouselState extends State<Carousel> {
   Future<bool> init()async{
 
 
-
+bytes.clear();
    // urls=await getFirebaseUrls(model);
    // imgSlider=mapImagesFromUrl(urls);
 
     //Si se activa esto, cambiar urls por bytes en Scaffold
-   // List<Uint8List> 
-    
-    bytes=await getFirebaseImages();
+
+    for(var x in widget.images){
+      bytes.add(widget.bytes[x]);
+    }
+   // bytes=widget.bytes;
+   // bytes=await getFirebaseImages();
 
     imgSlider=mapImagesFromBytes(bytes);
 

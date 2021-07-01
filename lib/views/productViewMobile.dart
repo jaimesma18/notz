@@ -10,6 +10,7 @@ import 'package:notz/services/auth.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_image/barcode_image.dart';*/
 import 'package:image/image.dart' as img;
+import 'package:notz/services/storageManager.dart';
 import 'package:notz/widgets/barcode.dart';
 import 'package:notz/widgets/bullets.dart';
 import 'package:notz/widgets/dimensions.dart';
@@ -33,6 +34,8 @@ class _ProductViewMobileState extends State<ProductViewMobile> {
   Map permissions;
   bool loaded=false;
   Map data=new Map();
+  Map<String,Uint8List> bytes=new Map<String,Uint8List>();  //int sgroup;
+
   //int sgroup;
   //String model="LC-1192";
   Product product;
@@ -95,7 +98,7 @@ Future<Product> downloadProduct(String model)async{
 
         else {
           product = data['product'];
-
+          getFirebaseImages().whenComplete(() => print('len: ${bytes.length}'));
           selectedWidget = Bullets(bullets: product
               .bullets,edit: permissions[selectedWidgetText]>1,model: product.model,mobile: true,);
 
@@ -132,7 +135,11 @@ Future<Product> downloadProduct(String model)async{
               SizedBox(height: 10,),
               Center(child: Text(product.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),)),
               SizedBox(height: 6,),
-              Carousel(images: product.photos,model: product.model,),
+              Carousel(
+                images: product.photos,
+                model: product.model,
+                bytes: bytes,
+               ),
               SizedBox(height: 6,),
               RichText(
                 text: new TextSpan(
@@ -376,4 +383,26 @@ Future<Product> downloadProduct(String model)async{
     }
   }
 
+
+  Future<void> getFirebaseImages() async{
+
+    Uint8List byte;
+    bytes.clear();
+
+    // List<Uint8List> l=[];
+    // print(widget.images);
+    if(product!=null&&product.photos.isNotEmpty)
+      for(var x in product.photos){
+        if(x!=null) {
+          byte = await StorageManager().downloadFile(
+              "productos/${product.model}/$x");
+          bytes[x]=byte;
+        }
+      }
+
+    setState(() {
+
+    });
+
+  }
 }
