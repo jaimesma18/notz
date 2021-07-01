@@ -23,7 +23,7 @@ class _ImageEditorState extends State<ImageEditor> {
     return Scaffold(
 
       appBar: AppBar(title: Text("Modificar Imagenes"),),
-      body: Center(child: ImageUploader(model: data['model'],bytes: data['bytes'],photos: data['photos'],)),
+      body: Center(child: ImageUploader(model: data['model'],bytes: data['bytes']??[],photos: data['photos'],)),
 
 
     );
