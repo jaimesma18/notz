@@ -146,19 +146,8 @@ class _CarouselState extends State<Carousel> {
         byte = await StorageManager().downloadFile(
             "productos/${widget.model}/$x");
       }
-     /* else{
-        byte=(await rootBundle.load('assets/images/logo_Lloyds.jpg'))
-            .buffer
-            .asUint8List();
-      }
-      if(byte==null){
-        (await rootBundle.load('assets/images/logo_Lloyds.jpg'))
-            .buffer
-            .asUint8List();
-      }*/
-
       l.add(byte);
-     // l.add(await StorageManager().downloadFile("productos/${widget.model}/$x"));
+
     }
 
     return l;
