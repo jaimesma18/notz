@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 //import 'package:universal_html/html.dart';
-
+//import 'package:multi_select_flutter/multi_select_flutter.dart' as multiSelect;
+//import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 class ViewWidget extends StatefulWidget {
 
   String field;
   dynamic value;
   int valid;
+  String type;
  
-  ViewWidget({this.field,this.value,this.valid});
+  ViewWidget({this.field,this.value,this.valid,this.type});
   @override
   _ViewWidgetState createState() => _ViewWidgetState();
 }
@@ -28,6 +30,7 @@ class _ViewWidgetState extends State<ViewWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return wrapCard();
 
   }
@@ -66,8 +69,43 @@ class _ViewWidgetState extends State<ViewWidget> {
 
     val='$val';
 
+    /*if( widget.type.endsWith("]")) {
+      List<multiSelect.MultiSelectItem> l=[];
+      List temp=widget.value.split(';');
+      for(var x in temp){
+        l.add(MultiSelectItem(x,x));
+      }
+
+      return Container(
+        child: Center(
+          child: ConstrainedBox(constraints: BoxConstraints(maxHeight: 26),
+            child: (
+                multiSelect.MultiSelectChipDisplay(
+                  alignment: Alignment.center,
+                  textStyle: TextStyle(color: Colors.blue,fontSize: 14,fontWeight: FontWeight.bold),
+
+                  //decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
+                  //chipColor: Colors.green,
+                  colorator: (index){
+                      return Colors.lightBlue[50];
+
+                  },
+                  scroll: true,
+                  onTap: (val){
+                    print(val);
+                  },
+                  items:l,// widget.value.split(";").map((e) => MultiSelectItem(e, e)).toList(),
+
+                )),
+          ),
+        ),
+      );
+    }*/
+   // else{
       return (
-      Center(child: SelectableText(val.replaceAll(";"," ; "),style: TextStyle(color: Colors.blue,fontSize: 14,fontWeight: FontWeight.bold),textAlign: TextAlign.center,)));
+          Center(child: SelectableText(val.replaceAll(";"," ; "),style: TextStyle(color: Colors.blue,fontSize: 14,fontWeight: FontWeight.bold),textAlign: TextAlign.center,)));
+    //}
+
     }
   }
 

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:notz/classes/category.dart';
@@ -653,7 +652,7 @@ Widget buildTemplate(){
           children: List.generate(l1.length, (int index) {
             return  Padding(
               padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],valid: determineStatus(data[l1[index]]['value'], data[l1[index]]['type']),)
+              child: ViewWidget(field: l1[index],value: data[l1[index]]['value'],valid: determineStatus(data[l1[index]]['value'], data[l1[index]]['type']),type: data[l1[index]]['type'])
               //child: createStringField(l1[index]),
             );
           })),
