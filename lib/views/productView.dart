@@ -102,7 +102,7 @@ Future<Product> downloadProduct(String model)async{
 
         else {
           product = data['product'];
-          getFirebaseImages().whenComplete(() => print('len: ${bytes.length}'));
+          getFirebaseImages().whenComplete(() {});
          // getFirebaseImages().then((value) => bytes=value);
          
           selectedWidget = Bullets(bullets: product

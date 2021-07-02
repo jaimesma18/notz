@@ -269,7 +269,6 @@ class _ImageUploaderState extends State<ImageUploader> {
                     if (filePickerResult.files.isNotEmpty) {
                       String name = filePickerResult.files[0].name;
                       int size = filePickerResult.files[0].size;
-                      print(size);
                       if (!bytes.containsKey(name)) {
                         bytes[name]= filePickerResult.files[0].bytes;
                         photos.add(name);
