@@ -38,6 +38,7 @@ class _ProductViewState extends State<ProductView> {
   Map<String,Uint8List> bytes=new Map<String,Uint8List>();  //int sgroup;
   //String model="LC-1192";
   Product product;
+  bool imagesLoaded=false;
   TextEditingController search= new TextEditingController();
   ScrollController scroller=new ScrollController();
 
@@ -192,12 +193,18 @@ Future<Product> downloadProduct(String model)async{
                             Positioned(top: 0,right: 70,
                               child: IconButton(icon: Icon(Icons.edit,color: Colors.blue,),onPressed:()async
                                {
-                                 Map m=new Map();
-                                 m['model']=product.model;
-                                 m['photos']=product.photos;
-                                 m['bytes']=bytes;
-                                  await Navigator.pushNamed(context, "/imageEditor",arguments: m);
-
+                                 if(imagesLoaded) {
+                                   Map m = new Map();
+                                   m['model'] = product.model;
+                                   m['photos'] = product.photos;
+                                   m['bytes'] = bytes;
+                                   await Navigator.pushNamed(
+                                       context, "/imageEditor", arguments: m);
+                                   setState(() {
+                                     product.photos=m['photos'];
+                                     bytes=m['bytes'];
+                                   });
+                                 }
                               /*     print('post');
                                  product= await  downloadProduct(product.model);
 
@@ -375,7 +382,7 @@ Future<Product> downloadProduct(String model)async{
       }
 
     setState(() {
-
+          imagesLoaded=true;
     });
 
   }

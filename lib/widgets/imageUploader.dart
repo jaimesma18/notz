@@ -235,7 +235,12 @@ class _ImageUploaderState extends State<ImageUploader> {
                     attaching = true;
                     ordenar = "Subir";
                     height = 8;
-                    attached = "Se adjunto ${filePickerResult.files[0].name}";
+                    if (!bytes.containsKey(filePickerResult.files[0].name)) {
+                      attached = "Se adjunto ${filePickerResult.files[0].name}";
+                    }
+                    else{
+                      attached = "${filePickerResult.files[0].name} ya existe";
+                    }
                     enabledButton = true;
                   });
                 }
@@ -249,7 +254,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                 }
               },),
           ),
-          attached == "" ? Container() : Text(attached),
+          attached == "" ? Container() : Text(attached, style: TextStyle(color: Colors.blue),),
 
           Padding(
             padding: EdgeInsets.fromLTRB(0, height, 0, 0),

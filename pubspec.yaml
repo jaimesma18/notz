@@ -42,6 +42,8 @@ dependencies:
   universal_html: ^1.2.4
   multi_select_flutter: ^3.1.8
   flutter_spinkit: ^4.1.2
+  flutter_dropzone: ^1.0.10
+  dotted_border: ^2.0.0
 
 
 
