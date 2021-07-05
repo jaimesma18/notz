@@ -4,12 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:notz/services/auth.dart';
-/*import 'package:barcode/barcode.dart';
-import 'package:barcode_widget/barcode_widget.dart';
-import 'package:barcode_image/barcode_image.dart';*/
-import 'package:image/image.dart' as img;
 import 'package:notz/services/storageManager.dart';
 import 'package:notz/widgets/barcode.dart';
 import 'package:notz/widgets/bullets.dart';

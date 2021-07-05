@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:notz/services/storageManager.dart';
 import 'package:notz/services/db.dart';
-//import 'package:notz/widgets/dragAndDrop.dart';
+import 'package:notz/widgets/dragAndDrop.dart';
 import 'package:reorderables/reorderables.dart';
-//import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 
 
@@ -323,6 +323,11 @@ class _ImageUploaderState extends State<ImageUploader> {
                 },),
             ),
           ),
+
+        kIsWeb?
+        DragAndDrop(width: 400,height:300 ,onDrop: (){
+          print("hola");
+        },instructions: "Arrastra varias fotos",):Container()
 
         //  kIsWeb?DragAndDrop():Container(),
 

@@ -98,7 +98,7 @@ Future<Product> downloadProduct(String model)async{
 
         else {
           product = data['product'];
-          getFirebaseImages().whenComplete(() => print('len: ${bytes.length}'));
+          getFirebaseImages().whenComplete(() {});
           selectedWidget = Bullets(bullets: product
               .bullets,edit: permissions[selectedWidgetText]>1,model: product.model,mobile: true,);
 
