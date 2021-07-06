@@ -29,8 +29,10 @@ class _ImageUploaderState extends State<ImageUploader> {
   Map<String,Uint8List>bytes;
   List initPhotos=[];
   Map<String,Uint8List>initBytes= new  Map<String,Uint8List>();
+  Map<String,Uint8List> bytesBuffer=new Map<String,Uint8List>();
   List<String> newPhotos=[];
   List<String> existingPhotos=[];
+  List<String> oversizedPhotos=[];
 
 
   FilePickerResult filePickerResult;
@@ -282,47 +284,49 @@ class _ImageUploaderState extends State<ImageUploader> {
                       enabledButton=false;
                     });
                     if (attaching) {
-                      if (filePickerResult.files.isNotEmpty) {
-                        String name = filePickerResult.files[0].name;
-                        int size = filePickerResult.files[0].size;
-                        if (!bytes.containsKey(name)) {
-                          bytes[name]= filePickerResult.files[0].bytes;
-                          photos.add(name);
-                          setState(() {
-                            buildTiles();
-                          });
+                      if (bytesBuffer.isNotEmpty) {
+                        for (var x in bytesBuffer.keys) {
+                          String name = x;
+                         // int size = filePickerResult.files[0].size;
+                          if (!bytes.containsKey(name)) {
+                            bytes[name] = bytesBuffer[x];
+                            photos.add(name);
+                            setState(() {
+                              buildTiles();
+                            });
 
 
+
+
+
+                          }
+                          else {
+                            print("existe");
+                          }
+                        }
+                        for (var x in bytesBuffer.keys) {
                           StorageManager sm = new StorageManager();
                           Map<String, String> m = new Map();
                           m['contentType'] = "image/jpeg";
                           TaskSnapshot res = await sm.uploadRaw(
-                              filePickerResult.files[0].bytes,
-                              "/productos/$model/$name",
+                              bytesBuffer[x],
+                              "/productos/$model/$x",
                               contentType: "image/jpeg");
-
-                          await DatabaseService().updateProduct(model,
-                              photos: photos);
-
-                         // await init();
-                          /*  Reference storageRef = FirebaseStorage.instance.ref(
-                              res.metadata.fullPath);*/
-                          /*  storageRef.getDownloadURL().then((value) async {
-                         photos.add(value);
-                         photosNames[value] = name;
-                         await DatabaseService().updateProduct(model,
-                             photos: photos, photosNames: photosNames);
-                         await init();
-                       });*/
-                          setState(() {
-                            attaching = false;
-                            ordenar = "Ordenar";
-                            enabledButton = false;
-                          });
                         }
-                        else {
-                          print("existe");
-                        }
+                        await DatabaseService().updateProduct(model,
+                            photos: photos);
+
+                        setState(() {
+                          attaching = false;
+                          ordenar = "Ordenar";
+                          enabledButton = false;
+                          newPhotos.clear();
+                          existingPhotos.clear();
+                          oversizedPhotos.clear();
+                          attached="";
+                          bytesBuffer.clear();
+
+                        });
                       }
                     }
                     else {
@@ -350,11 +354,13 @@ class _ImageUploaderState extends State<ImageUploader> {
                       enabledButton=false;
                       newPhotos.clear();
                       existingPhotos.clear();
+                      oversizedPhotos.clear();
                       attached="";
                       attaching=false;
                       ordenar = "Ordenar";
                       widget.photos.clear();
                       widget.bytes.clear();
+                      bytesBuffer.clear();
                       for(var x in initPhotos){
                         widget.photos.add(x);
                       }
@@ -376,15 +382,17 @@ class _ImageUploaderState extends State<ImageUploader> {
 
             onDrop: (val){
             Map m=new Map();
-            print(val.keys.toList()[0]);
               if (val!=null&&val.length>0) {
                 setState(() {
                   attaching = true;
                   ordenar = "Subir";
                   height = 8;
                   String name=val.keys.toList()[0];
+                  Uint8List byte=val.values.toList()[0];
                   if (!bytes.containsKey(name)&&!newPhotos.contains(name)) {
                     newPhotos.add(name);
+                    bytesBuffer[name]=byte;
+
                    // attached = "Se adjunto $name \n$attached";
                   }
                   else{
@@ -404,6 +412,19 @@ class _ImageUploaderState extends State<ImageUploader> {
                       attached='$attached$x\n';
                     }
                   }
+
+                  if(oversizedPhotos.isNotEmpty){
+
+                    if (oversizedPhotos.isNotEmpty) {
+                      attached =
+                      "$attached\n\nFotos no adjuntadas (mayor que 400 kb):\n";
+                      for (var x in oversizedPhotos) {
+                        attached = '$attached$x\n';
+                      }
+
+                  }
+                  }
+
                   enabledButton = true;
                 });
               }
@@ -416,7 +437,25 @@ class _ImageUploaderState extends State<ImageUploader> {
                 });
               }
 
-          },instructions: "Arrastra varias fotos",):Container()
+          },
+            sizeExceeds: (val){
+            setState(() {
+              enabledButton = true;
+              if(!oversizedPhotos.contains(val)) {
+                oversizedPhotos.add(val);
+                if (oversizedPhotos.isNotEmpty) {
+                  attached =
+                  "$attached\n\nFotos no adjuntadas (mayor que 400 kb):\n";
+                  for (var x in oversizedPhotos) {
+                    attached = '$attached$x\n';
+                  }
+                }
+              }
+            });
+
+            },
+            maxKb: 400,
+            instructions: "Arrastra varias fotos",):Container()
 
           //  kIsWeb?DragAndDrop():Container(),
 

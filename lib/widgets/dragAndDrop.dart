@@ -11,8 +11,10 @@ class DragAndDrop extends StatefulWidget {
   double width;
   double height;
   Function onDrop;
+  Function sizeExceeds;
   String instructions;
   List<String> extensions;
+  int maxKb;
 
 
 
@@ -21,8 +23,9 @@ class DragAndDrop extends StatefulWidget {
      this.height,
       this.onDrop,
      this.instructions,
-
-        this.extensions
+        this.extensions,
+        this.maxKb,
+        this.sizeExceeds,
    });
   _DragDropState createState() => _DragDropState();
 }
@@ -32,6 +35,14 @@ class _DragDropState extends State<DragAndDrop> {
   DropzoneViewController controller;
   Color bordercolor = Color(0xFFCBD2D6);
 
+  void sizeExceeds(dynamic val) {
+    widget.sizeExceeds(val);
+    setState(() {
+      //bordercolor = Colors.red;
+      loaded = false;
+    });
+  }
+
   void fun(dynamic val) {
     widget.onDrop(val);
     setState(() {
@@ -39,6 +50,8 @@ class _DragDropState extends State<DragAndDrop> {
       loaded = true;
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,11 +88,19 @@ class _DragDropState extends State<DragAndDrop> {
               onError: (ev) => setState(() => bordercolor = Colors.red),
               onDrop: (val) {
                 Map m=new Map();
-                controller.getFileData(val).then((value) {
-                  m[val.name]=value;
-                  fun(m);
+                controller.getFileSize(val).then((value) {
+                 if(value/1000>widget.maxKb){
+                   sizeExceeds(val.name);
+                 }
+                 else{
+                   controller.getFileData(val).then((value) {
+                     m[val.name]=value;
+                     fun(m);
 
+                   });
+                 }
                 });
+
                 //controller.getFileData(val).then((value) => fun(value));
               },
             ),
@@ -125,8 +146,17 @@ class _DragDropState extends State<DragAndDrop> {
                         FilePickerResult result = await FilePicker.platform
                             .pickFiles(type: FileType.custom,
                                 allowedExtensions: widget.extensions ?? ["jpg","png","gif"]);
-                        final bytes = result.files.single.bytes;
-                        fun(bytes);
+                        if(result.files.single.size/1000>widget.maxKb){
+                          widget.sizeExceeds(result.files.single.name);
+                          loaded=false;
+
+                        }
+                        else {
+                          final bytes = result.files.single.bytes;
+                          Map m = new Map();
+                          m[result.files.single.name] = bytes;
+                          fun(m);
+                        }
                       },
                     )),
                   )),
