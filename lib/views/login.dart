@@ -24,6 +24,8 @@ class _LoginState extends State<Login> {
 
     email='jaime.saad@lloydselectronica.com';
     password="test1234";
+    dynamic res =  _auth.signIn(email, password);
+
     super.initState();
   }
 
@@ -99,8 +101,13 @@ class _LoginState extends State<Login> {
               SizedBox(height: 14,),
               Text(error,style: TextStyle(color: Colors.red,fontSize: 14),),
               error==""?Container():SizedBox(height: 14,),
-              
 
+              FlatButton(child: Text("Logout",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold),),onPressed: ()async{
+                //   if(_formKey.currentState.validate()) {
+                 await _auth.signOut();
+
+                //   }
+              },),
 
 
             ]),

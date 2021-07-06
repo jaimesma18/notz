@@ -185,7 +185,7 @@ Future<Product> downloadProduct(String model)async{
                          // Container(child: Text("$sgroup"),),
                           Stack(children: [
 
-                            Positioned(top: 0,right: 70,
+                            imagesLoaded?Positioned(top: 0,right: 70,
                               child: IconButton(icon: Icon(Icons.edit,color: Colors.blue,),onPressed:()async
                                {
                                  if(imagesLoaded) {
@@ -206,7 +206,7 @@ Future<Product> downloadProduct(String model)async{
                                  print(product.photos);*/
 
                               },),
-                            ),
+                            ):Container(),
 
                             Container(padding:EdgeInsets.all(40),child: Carousel(
                               images: product.photos,
