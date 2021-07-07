@@ -44,10 +44,8 @@ class _ImageUploaderState extends State<ImageUploader> {
   String ordenar="Ordenar";
   bool enableAttachButton=false;
   bool enableCancelButton=false;
-
-  String attached="";
-
-
+  int maxKb=500;
+  List<String> ext=["jpg","png","gif"];
 
 
 
@@ -101,12 +99,23 @@ class _ImageUploaderState extends State<ImageUploader> {
                 photos.remove(photoName);
                 bytes.remove(photoName);
 
+                initPhotos.clear();
+                initBytes.clear();
+                for(var x in photos){
+                  initPhotos.add(x);
+                }
+                for(var x in bytes.keys){
+                  initBytes[x]=widget.bytes[x];
+                }
+
                 await DatabaseService().updateProduct(
                     model, photos: photos);
                 setState(() {
+                  enableCancelButton=false;
                   buildTiles();
                 //  init();
                 });
+
 
               },)
         ),
@@ -149,7 +158,8 @@ class _ImageUploaderState extends State<ImageUploader> {
 
       SingleChildScrollView(
         child: Container(
-          child: Column(children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
 
             _tiles.isEmpty?Container():
             ReorderableWrap(
@@ -173,145 +183,120 @@ class _ImageUploaderState extends State<ImageUploader> {
                 }
             ),
 
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 16),
-              child: RaisedButton(color: Colors.blue,
-                child: Text("Adjuntar", style: TextStyle(color: Colors.white)),
-                onPressed: () async {
-                  filePickerResult = await FilePicker.platform.pickFiles(
-                      withData: true);
-                  if (filePickerResult.files.isNotEmpty) {
-                    setState(() {
-                      attaching = true;
-                      ordenar = "Subir";
-                      height = 8;
-                      if (!bytes.containsKey(filePickerResult.files[0].name)) {
-                        attached = "Se adjunto ${filePickerResult.files[0].name}";
-                      }
-                      else{
-                        attached = "${filePickerResult.files[0].name} ya existe";
-                      }
-                      enableAttachButton = true;
-                      enableCancelButton=true;
-                    });
-                  }
-                  else {
-                    attaching = false;
-                    ordenar = "Ordenar";
-                    height = 0;
-                    setState(() {
-                      attached = "";
-                    });
-                  }
-                },),
-            ),
-            attached == "" ? Container() : Text(attached, style: TextStyle(color: Colors.blue),),
+
+
+
 
             Padding(
-              padding: EdgeInsets.fromLTRB(0, height, 0, 0),
-              child: Opacity(opacity: enableAttachButton ? 1 : 0.3,
-                child: RaisedButton(color: enableAttachButton?Colors.blue:Colors.grey,
-                  child: Text(ordenar, style: TextStyle(color: Colors.white),),
-                  onPressed: !enableAttachButton ? null : () async {
-                    setState(() {
-                      enableAttachButton=false;
-                      enableCancelButton=false;
-                    });
-                    if (attaching) {
-                      if (bytesBuffer.isNotEmpty) {
-                        for (var x in bytesBuffer.keys) {
-                          String name = x;
-                         // int size = filePickerResult.files[0].size;
-                          if (!bytes.containsKey(name)) {
-                            bytes[name] = bytesBuffer[x];
-                            photos.add(name);
+              padding:  EdgeInsets.fromLTRB(0,height,0,height),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                    child: Opacity(opacity: enableAttachButton ? 1 : 0.3,
+                      child: RaisedButton(color: enableAttachButton?Colors.blue:Colors.grey,
+                        child: Text(ordenar, style: TextStyle(color: Colors.white),),
+                        onPressed: !enableAttachButton ? null : () async {
+                          setState(() {
+                            enableAttachButton=false;
+                            enableCancelButton=false;
+                          });
+                          if (attaching) {
+                            if (bytesBuffer.isNotEmpty) {
+                              for (var x in bytesBuffer.keys) {
+                                String name = x;
+                                if (!bytes.containsKey(name)) {
+                                  bytes[name] = bytesBuffer[x];
+                                  photos.add(name);
+                                  setState(() {
+                                    buildTiles();
+                                  });
+
+                                }
+                                else {
+                                  print("existe");
+                                }
+                              }
+                              for (var x in bytesBuffer.keys) {
+                                StorageManager sm = new StorageManager();
+                                Map<String, String> m = new Map();
+                                m['contentType'] = "image/jpeg";
+                                TaskSnapshot res = await sm.uploadRaw(
+                                    bytesBuffer[x],
+                                    "/productos/$model/$x",
+                                    contentType: "image/jpeg");
+                              }
+                              await DatabaseService().updateProduct(model,
+                                  photos: photos);
+
+                              setState(() {
+                                attaching = false;
+                                ordenar = "Ordenar";
+                                enableAttachButton = false;
+                                enableCancelButton=false;
+                                newPhotos.clear();
+                                existingPhotos.clear();
+                                oversizedPhotos.clear();
+                                wrongFormat.clear();
+                                bytesBuffer.clear();
+
+
+                              });
+                            }
+                          }
+                          else {
+                            await DatabaseService().updateProduct(model, photos: photos, );
                             setState(() {
                               buildTiles();
                             });
 
 
-
-
-
                           }
-                          else {
-                            print("existe");
+                          initPhotos.clear();
+                          initBytes.clear();
+                          for(var x in photos){
+                            initPhotos.add(x);
                           }
-                        }
-                        for (var x in bytesBuffer.keys) {
-                          StorageManager sm = new StorageManager();
-                          Map<String, String> m = new Map();
-                          m['contentType'] = "image/jpeg";
-                          TaskSnapshot res = await sm.uploadRaw(
-                              bytesBuffer[x],
-                              "/productos/$model/$x",
-                              contentType: "image/jpeg");
-                        }
-                        await DatabaseService().updateProduct(model,
-                            photos: photos);
-
-                        setState(() {
-                          attaching = false;
-                          ordenar = "Ordenar";
-                          enableAttachButton = false;
-                          enableCancelButton=false;
-                          newPhotos.clear();
-                          existingPhotos.clear();
-                          oversizedPhotos.clear();
-                          wrongFormat.clear();
-                          attached="";
-                          bytesBuffer.clear();
-
-                        });
-                      }
-                    }
-                    else {
-                      await DatabaseService().updateProduct(model, photos: photos, );
-                      setState(() {
-                        buildTiles();
-                      });
-
-
-                    }
-                 //   setState(() {
-                  //    enabledButton=true;
-                  //  });
-                  },),
-              ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, height, 0, 0),
-              child: Opacity(opacity: enableCancelButton ? 1 : 0.3,
-                child: RaisedButton(color: enableCancelButton?Colors.blue:Colors.grey,
-                  child: Text("Cancelar", style: TextStyle(color: Colors.white),),
-                  onPressed: !enableCancelButton ? null : () async {
-                    setState(() {
-                      enableAttachButton=false;
-                      enableCancelButton=false;
-                      newPhotos.clear();
-                      existingPhotos.clear();
-                      oversizedPhotos.clear();
-                      wrongFormat.clear();
-                      attached="";
-                      attaching=false;
-                      ordenar = "Ordenar";
-                      widget.photos.clear();
-                      widget.bytes.clear();
-                      bytesBuffer.clear();
-                      for(var x in initPhotos){
-                        widget.photos.add(x);
-                      }
-                      for(var x in initBytes.keys){
-                        widget.bytes[x]=initBytes[x];
-                      }
-                      photos=widget.photos;
-                      bytes=widget.bytes;
-                      buildTiles();
-                    });
+                          for(var x in bytes.keys){
+                            initBytes[x]=widget.bytes[x];
+                          }
+                        },),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Opacity(opacity: enableCancelButton ? 1 : 0.3,
+                      child: RaisedButton(color: enableCancelButton?Colors.blue:Colors.grey,
+                        child: Text("Cancelar", style: TextStyle(color: Colors.white),),
+                        onPressed: !enableCancelButton ? null : () async {
+                          setState(() {
+                            enableAttachButton=false;
+                            enableCancelButton=false;
+                            newPhotos.clear();
+                            existingPhotos.clear();
+                            oversizedPhotos.clear();
+                            wrongFormat.clear();
+                            attaching=false;
+                            ordenar = "Ordenar";
+                            widget.photos.clear();
+                            widget.bytes.clear();
+                            bytesBuffer.clear();
+                            for(var x in initPhotos){
+                              widget.photos.add(x);
+                            }
+                            for(var x in initBytes.keys){
+                              widget.bytes[x]=initBytes[x];
+                            }
+                            photos=widget.photos;
+                            bytes=widget.bytes;
+                            buildTiles();
+                          });
 
 
-                  },),
+                        },),
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -378,9 +363,77 @@ class _ImageUploaderState extends State<ImageUploader> {
               }
 
             },
-            maxKb: 400,
-            extensions: ["jpg","png","gif"],
-            instructions: "Arrastra varias fotos",):Container(),
+            maxKb: maxKb,
+            extensions: ext,
+            instructions: "Arrastra varias fotos",):
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 16),
+            child: RaisedButton(color: Colors.blue,
+              child: Text("Adjuntar", style: TextStyle(color: Colors.white)),
+              onPressed: () async {
+
+                FilePickerResult result = await FilePicker.platform
+                    .pickFiles(type: FileType.custom,
+                    allowedExtensions: ext);
+
+                if(result!=null) {
+                  if (ext != null) {
+                    if (ext.isNotEmpty) {
+                      if (!ext.contains(
+                          result.files.single.name.substring(
+                              result.files.single.name.length - 3))) {
+                        if(!wrongFormat.contains(result.files.single.name)){
+                          setState(() {
+                            enableCancelButton=true;
+                            wrongFormat.add(result.files.single.name);
+
+                          });
+
+                        }
+                      }
+                      else {
+                        if (result.files.single.size / 1000 >
+                            maxKb) {
+
+                          if(!oversizedPhotos.contains(result.files.single.name)) {
+                            setState(() {
+                              enableCancelButton=true;
+                              oversizedPhotos.add(result.files.single.name);
+                            });
+                          }
+                        }
+                        else {
+                          String name=result.files.single.name;
+                          final byte = result.files.single.bytes;
+                          setState(() {
+                            attaching = true;
+                            ordenar = "Subir";
+                            height = 8;
+                            if (!bytes.containsKey(name)&&!newPhotos.contains(name)) {
+                              newPhotos.add(name);
+                              bytesBuffer[name]=byte;
+                              setState(() {
+                                enableAttachButton=true;
+                                enableCancelButton=true;
+                              });
+
+                            }
+                            else{
+                              if(!existingPhotos.contains(name)&&!newPhotos.contains(name))
+                                existingPhotos.add(name);
+                              setState(() {
+                                enableCancelButton=true;
+                              });
+                            }
+                          });
+                        }
+                      }
+                    }
+                  }
+                }
+
+              },),
+          ),
 
           newPhotos.isNotEmpty||existingPhotos.isNotEmpty||oversizedPhotos.isNotEmpty||wrongFormat.isNotEmpty?
           DataTable(headingTextStyle: TextStyle(fontWeight: FontWeight.bold),
@@ -389,9 +442,8 @@ class _ImageUploaderState extends State<ImageUploader> {
               DataColumn(label: Text("Status")),
               DataColumn(label: Text("Detalle")),
             ],
-            rows: prepareRows(400, ["jpg","png","gif"]),
+            rows: prepareRows(),
           ):Container(),
-          //  kIsWeb?DragAndDrop():Container(),
 
           ],),
 
@@ -402,7 +454,7 @@ class _ImageUploaderState extends State<ImageUploader> {
 
 
 
-  List<DataRow> prepareRows(int size,List<String> ext){
+  List<DataRow> prepareRows(){
    List<DataRow> rows=[];
    String formats=ext.join(", ");
 
@@ -426,7 +478,7 @@ class _ImageUploaderState extends State<ImageUploader> {
 
    for(var x in oversizedPhotos){
      rows.add(DataRow(
-         cells: [DataCell(Text(x)),DataCell(Icon(Icons.cancel_outlined,color: Colors.red,)),DataCell(Text("Imagen es mayor que $size kB"))]
+         cells: [DataCell(Text(x)),DataCell(Icon(Icons.cancel_outlined,color: Colors.red,)),DataCell(Text("Imagen es mayor que $maxKb kB"))]
      ));
    }
 
