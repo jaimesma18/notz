@@ -33,6 +33,7 @@ class _ImageUploaderState extends State<ImageUploader> {
   List<String> newPhotos=[];
   List<String> existingPhotos=[];
   List<String> oversizedPhotos=[];
+  List<String> wrongFormat=[];
 
 
   FilePickerResult filePickerResult;
@@ -41,7 +42,9 @@ class _ImageUploaderState extends State<ImageUploader> {
   List<Widget> _tiles=[];
   bool attaching=false;
   String ordenar="Ordenar";
-  bool enabledButton=false;
+  bool enableAttachButton=false;
+  bool enableCancelButton=false;
+
   String attached="";
 
 
@@ -71,23 +74,6 @@ class _ImageUploaderState extends State<ImageUploader> {
 
   }
 
-  /*Future<bool> getFirebaseImages() async{
-
-    Uint8List byte;
-
-    // List<Uint8List> l=[];
-    if(photos!=null&&photos.isNotEmpty)
-      for(var x in photos){
-        if(photos!=null&&x!=null) {
-          byte = await StorageManager().downloadFile(
-              "productos/${widget.model}/$x");
-        }
-        bytes[x]=byte;
-        // l.add(byte);
-      }
-    return bytes.isNotEmpty;
-    //  return l;
-  }*/
   void buildTiles(){
 
     _tiles.clear();
@@ -128,61 +114,6 @@ class _ImageUploaderState extends State<ImageUploader> {
       ],),
     );
   }
- /* Future init()async{
-    photos.clear();
-    bytes.clear();
-    _tiles.clear();
-    await DatabaseService().getProducto(model).then((value) {
-      photos=value.photos;
-      //photosNames=value.photosName;
-
-    });
-
-    await getFirebaseImages();
-
-    if(photos!=null&&photos.isNotEmpty) {
-      for (var x in photos) {
-        _tiles.add( Image.network(x
-        ,height: 100,),)  ;
-
-        _tiles.add(
-            Padding(
-              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-              child: Stack(children: [
-                Image.memory(bytes[x]
-                  // Image.network(x
-                  , height: 100,),
-                Positioned(top: 0, right: -10,
-                    child: IconButton(
-                      icon: Icon(Icons.clear, color: Colors.blue, size: 16,),
-                      onPressed: () async {
-                        print(x);
-                        await StorageManager().deleteCloudFile(
-                            "productos/$model/$x");
-
-
-                        photos.remove(x);
-
-                        await DatabaseService().updateProduct(
-                            model, photos: photos);
-                        setState(() {
-                          init();
-                        });
-
-                      },)
-                ),
-
-              ],),
-            ));
-      }
-    }
-    setState(() {
-
-    });
-
-    return true;
-  }*/
-
 
 
 
@@ -207,7 +138,8 @@ class _ImageUploaderState extends State<ImageUploader> {
       setState(() {
         Widget row = _tiles.removeAt(oldIndex);
         _tiles.insert(newIndex, row);
-        enabledButton = true;
+        enableAttachButton = true;
+        enableCancelButton=true;
       });
     }
 
@@ -259,7 +191,8 @@ class _ImageUploaderState extends State<ImageUploader> {
                       else{
                         attached = "${filePickerResult.files[0].name} ya existe";
                       }
-                      enabledButton = true;
+                      enableAttachButton = true;
+                      enableCancelButton=true;
                     });
                   }
                   else {
@@ -276,12 +209,13 @@ class _ImageUploaderState extends State<ImageUploader> {
 
             Padding(
               padding: EdgeInsets.fromLTRB(0, height, 0, 0),
-              child: Opacity(opacity: enabledButton ? 1 : 0.3,
-                child: RaisedButton(color: enabledButton?Colors.blue:Colors.grey,
+              child: Opacity(opacity: enableAttachButton ? 1 : 0.3,
+                child: RaisedButton(color: enableAttachButton?Colors.blue:Colors.grey,
                   child: Text(ordenar, style: TextStyle(color: Colors.white),),
-                  onPressed: !enabledButton ? null : () async {
+                  onPressed: !enableAttachButton ? null : () async {
                     setState(() {
-                      enabledButton=false;
+                      enableAttachButton=false;
+                      enableCancelButton=false;
                     });
                     if (attaching) {
                       if (bytesBuffer.isNotEmpty) {
@@ -319,10 +253,12 @@ class _ImageUploaderState extends State<ImageUploader> {
                         setState(() {
                           attaching = false;
                           ordenar = "Ordenar";
-                          enabledButton = false;
+                          enableAttachButton = false;
+                          enableCancelButton=false;
                           newPhotos.clear();
                           existingPhotos.clear();
                           oversizedPhotos.clear();
+                          wrongFormat.clear();
                           attached="";
                           bytesBuffer.clear();
 
@@ -346,15 +282,17 @@ class _ImageUploaderState extends State<ImageUploader> {
 
             Padding(
               padding: EdgeInsets.fromLTRB(0, height, 0, 0),
-              child: Opacity(opacity: enabledButton ? 1 : 0.3,
-                child: RaisedButton(color: enabledButton?Colors.blue:Colors.grey,
+              child: Opacity(opacity: enableCancelButton ? 1 : 0.3,
+                child: RaisedButton(color: enableCancelButton?Colors.blue:Colors.grey,
                   child: Text("Cancelar", style: TextStyle(color: Colors.white),),
-                  onPressed: !enabledButton ? null : () async {
+                  onPressed: !enableCancelButton ? null : () async {
                     setState(() {
-                      enabledButton=false;
+                      enableAttachButton=false;
+                      enableCancelButton=false;
                       newPhotos.clear();
                       existingPhotos.clear();
                       oversizedPhotos.clear();
+                      wrongFormat.clear();
                       attached="";
                       attaching=false;
                       ordenar = "Ordenar";
@@ -392,71 +330,67 @@ class _ImageUploaderState extends State<ImageUploader> {
                   if (!bytes.containsKey(name)&&!newPhotos.contains(name)) {
                     newPhotos.add(name);
                     bytesBuffer[name]=byte;
+                    setState(() {
+                      enableAttachButton=true;
+                      enableCancelButton=true;
+                    });
 
-                   // attached = "Se adjunto $name \n$attached";
                   }
                   else{
                     if(!existingPhotos.contains(name)&&!newPhotos.contains(name))
                     existingPhotos.add(name);
-                    //attached = "$name ya existe \n";
-                  }
-                  if(newPhotos.isNotEmpty){
-                    attached="Se adjunto:\n";
-                    for(var x in newPhotos){
-                      attached='$attached$x\n';
-                    }
-                  }
-                  if(existingPhotos.isNotEmpty){
-                    attached="$attached\n\nYa existe:\n";
-                    for(var x in existingPhotos){
-                      attached='$attached$x\n';
-                    }
+                    setState(() {
+                      enableCancelButton=true;
+                    });
                   }
 
-                  if(oversizedPhotos.isNotEmpty){
 
-                    if (oversizedPhotos.isNotEmpty) {
-                      attached =
-                      "$attached\n\nFotos no adjuntadas (mayor que 400 kb):\n";
-                      for (var x in oversizedPhotos) {
-                        attached = '$attached$x\n';
-                      }
 
-                  }
-                  }
 
-                  enabledButton = true;
                 });
               }
               else {
                 attaching = false;
                 ordenar = "Ordenar";
                 height = 0;
-                setState(() {
-                  attached = "";
-                });
+
               }
 
           },
+            wrongFormat: (val){
+            if(!wrongFormat.contains(val)){
+              setState(() {
+                enableCancelButton=true;
+                wrongFormat.add(val);
+                
+              });
+
+            }
+            },
             sizeExceeds: (val){
-            setState(() {
-              enabledButton = true;
+
               if(!oversizedPhotos.contains(val)) {
-                oversizedPhotos.add(val);
-                if (oversizedPhotos.isNotEmpty) {
-                  attached =
-                  "$attached\n\nFotos no adjuntadas (mayor que 400 kb):\n";
-                  for (var x in oversizedPhotos) {
-                    attached = '$attached$x\n';
-                  }
-                }
+                setState(() {
+                  enableCancelButton=true;
+                  oversizedPhotos.add(val);
+                });
+
               }
-            });
 
             },
             maxKb: 400,
-            instructions: "Arrastra varias fotos",):Container()
+            extensions: ["jpg","png","gif"],
+            instructions: "Arrastra varias fotos",):Container(),
 
+          newPhotos.isNotEmpty||existingPhotos.isNotEmpty||oversizedPhotos.isNotEmpty||wrongFormat.isNotEmpty?
+          DataTable(headingTextStyle: TextStyle(fontWeight: FontWeight.bold),
+            columns: [
+              DataColumn(label: Text("Imagen")),
+              DataColumn(label: Text("Status")),
+              DataColumn(label: Text("Detalle")),
+            ],
+            rows: prepareRows(400, ["jpg","png","gif"]),
+          ):Container(),
           //  kIsWeb?DragAndDrop():Container(),
 
           ],),
@@ -466,7 +400,40 @@ class _ImageUploaderState extends State<ImageUploader> {
 
   }
 
-// );
+
+
+  List<DataRow> prepareRows(int size,List<String> ext){
+   List<DataRow> rows=[];
+   String formats=ext.join(", ");
+
+   for(var x in newPhotos){
+     rows.add(DataRow(
+       cells: [DataCell(Text(x)),DataCell(Icon(Icons.check_circle_outline,color: Colors.green,)),DataCell(Text("OK"))]
+     ));
+   }
+
+   for(var x in existingPhotos){
+     rows.add(DataRow(
+         cells: [DataCell(Text(x)),DataCell(Icon(Icons.cancel_outlined,color: Colors.red,)),DataCell(Text("Imagen ya existe"))]
+     ));
+   }
+
+   for(var x in wrongFormat){
+     rows.add(DataRow(
+         cells: [DataCell(Text(x)),DataCell(Icon(Icons.cancel_outlined,color: Colors.red,)),DataCell(Text("Archivo no es de tipo $formats"))]
+     ));
+   }
+
+   for(var x in oversizedPhotos){
+     rows.add(DataRow(
+         cells: [DataCell(Text(x)),DataCell(Icon(Icons.cancel_outlined,color: Colors.red,)),DataCell(Text("Imagen es mayor que $size kB"))]
+     ));
+   }
+
+
+   return rows;
+  }
+
 
 
 

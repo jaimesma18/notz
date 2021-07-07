@@ -12,6 +12,7 @@ class DragAndDrop extends StatefulWidget {
   double height;
   Function onDrop;
   Function sizeExceeds;
+  Function wrongFormat;
   String instructions;
   List<String> extensions;
   int maxKb;
@@ -26,6 +27,7 @@ class DragAndDrop extends StatefulWidget {
         this.extensions,
         this.maxKb,
         this.sizeExceeds,
+        this.wrongFormat,
    });
   _DragDropState createState() => _DragDropState();
 }
@@ -34,6 +36,14 @@ class _DragDropState extends State<DragAndDrop> {
   bool loaded = false;
   DropzoneViewController controller;
   Color bordercolor = Color(0xFFCBD2D6);
+
+
+  void wrongFormat(dynamic val) {
+    widget.wrongFormat(val);
+    setState(() {
+      loaded = false;
+    });
+  }
 
   void sizeExceeds(dynamic val) {
     widget.sizeExceeds(val);
@@ -71,7 +81,7 @@ class _DragDropState extends State<DragAndDrop> {
 
 
               onCreated: (ctrl) { controller = ctrl;
-              print("created");},
+             },
               onHover: (){
                 setState(() {
                   bordercolor=Colors.blue;
@@ -88,19 +98,31 @@ class _DragDropState extends State<DragAndDrop> {
               onError: (ev) => setState(() => bordercolor = Colors.red),
               onDrop: (val) {
                 Map m=new Map();
-                controller.getFileSize(val).then((value) {
-                 if(value/1000>widget.maxKb){
-                   sizeExceeds(val.name);
-                 }
-                 else{
-                   controller.getFileData(val).then((value) {
-                     m[val.name]=value;
-                     fun(m);
+
+                if(widget.extensions!=null) {
+                  if (widget.extensions.isNotEmpty) {
+                   controller.getFilename(val).then((value) {
+                     if(!widget.extensions.contains(value.substring(value.length-3))){
+                       wrongFormat(value);
+                     }
+                     else{
+                       controller.getFileSize(val).then((value) {
+                         if (value / 1000 > widget.maxKb) {
+                           sizeExceeds(val.name);
+                         }
+                         else {
+                           controller.getFileData(val).then((value) {
+                             m[val.name] = value;
+                             fun(m);
+                           });
+                         }
+                       });
+                     }
 
                    });
-                 }
-                });
 
+                  }
+                }
                 //controller.getFileData(val).then((value) => fun(value));
               },
             ),
@@ -146,16 +168,31 @@ class _DragDropState extends State<DragAndDrop> {
                         FilePickerResult result = await FilePicker.platform
                             .pickFiles(type: FileType.custom,
                                 allowedExtensions: widget.extensions ?? ["jpg","png","gif"]);
-                        if(result.files.single.size/1000>widget.maxKb){
-                          widget.sizeExceeds(result.files.single.name);
-                          loaded=false;
 
-                        }
-                        else {
-                          final bytes = result.files.single.bytes;
-                          Map m = new Map();
-                          m[result.files.single.name] = bytes;
-                          fun(m);
+                        if(result!=null) {
+                          if (widget.extensions != null) {
+                            if (widget.extensions.isNotEmpty) {
+                              if (!widget.extensions.contains(
+                                  result.files.single.name.substring(
+                                      result.files.single.name.length - 3))) {
+                                  wrongFormat(result.files.single.name);
+                              }
+                              else {
+                                if (result.files.single.size / 1000 >
+                                    widget.maxKb) {
+                                    sizeExceeds(result.files.single.name);
+
+                                  loaded = false;
+                                }
+                                else {
+                                  final bytes = result.files.single.bytes;
+                                  Map m = new Map();
+                                  m[result.files.single.name] = bytes;
+                                  fun(m);
+                                }
+                              }
+                            }
+                          }
                         }
                       },
                     )),
